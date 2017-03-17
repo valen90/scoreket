@@ -1,0 +1,20 @@
+#extend("base")
+
+#export("body") {
+<div class="row">
+    <div class="u-full-width">
+        <form action="/sc/register" method="post">
+            <label>Nickame</label>
+            <input name="nickname" class="u-full-width" type="nickname"/>
+            <label>Email</label>
+            <input name="email" class="u-full-width" type="email"/>
+            <label>Password</label>
+            <input name="password" class="u-full-width" type="password"/>
+            <input class="button-primary" type="submit" value="Register"/>
+        </form>
+
+    <p>Already a user? <a href="/sc/login">Login</a></p>
+
+    </div>
+</div>
+}
