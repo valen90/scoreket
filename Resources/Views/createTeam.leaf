@@ -1,0 +1,19 @@
+#extend("base")
+
+#export("body") {
+
+<div class="row">
+    <div class="u-full-width">
+        <form action="/sc/team" method="post">
+            <label>Team Name</label>
+            <input name="teamname" class="u-full-width" type="teamname"/>
+            <input class="button-primary" type="submit" value="Create"/>
+        </form>
+        
+    </div>
+</div>
+
+
+
+
+}

@@ -5,13 +5,43 @@
     <div class="row">
         <div class="u-full-width">
             #if(authenticated) {
-                <h5>Welcome #(name) - points: #(user.score)</h5>
+                <h5>Welcome #(name) - points: #(user.score) - team: #(user.scteam_id.teamName)</h5>
                 <a class="button" href="/sc/logout">Logout</a>
+                <a class="button" href="/sc/team">Teams</a>
             } ##else() {
                 <a class="button" href="/sc/login">Login</a>
                 <a class="button" href="/sc/register">Register</a>
             }
         </div>
     </div>
+    #if(authenticated) {
+        <div class="row">
+            <h4>Next games!</h4>
+        </div>
+        <div class="row">
+            <table class="u-full-width">
+                <thead>
+                    <tr>
+                        <th>Team one</th>
+                        <th>Team two</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    #loop(game, "game") {
+                        <tr>
+                            <td>#(game.team1.teamName)</td>
+                            <td>#(game.team2.teamName)</td>
+                            <td>#(game.date)</td>
+                        </tr>
+                        
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    }
+
+
 
 }

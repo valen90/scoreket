@@ -1,0 +1,57 @@
+#extend("base")
+
+#export("body") {
+<div class="row">
+    <div class="u-full-width">
+        #if(authenticated) {
+        <h5>Welcome #(user.nickname) - points: #(user.score) - team: #(user.scteam_id.teamName)</h5>
+        <a class="button" href="/sc/logout">Logout</a>
+        <a class="button" href="/sc">Index</a>
+        } ##else() {
+        <a class="button" href="/sc/login">Login</a>
+        <a class="button" href="/sc/register">Register</a>
+        }
+    </div>
+</div>
+#if(authenticated) {
+<div class="row">
+    <h4>Teams !</h4>
+    #if(actualTeam) {
+        <a class="button" href="/sc/team/#(user.id)/leave">Leave team</a>
+        } ##else() {
+            <a class="button" href="/sc/team/create">Create</a>
+        }
+</div>
+<div class="row">
+    <table class="u-full-width">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Enrole</th>
+            </tr>
+        </thead>
+        <tbody>
+            #loop(teams, "team") {
+            <tr>
+                <td>#(team.teamName)</td>
+                <td>
+                    #if(actualTeam) {
+                        <td>Already on a team!</td>
+                    } ##else() {
+                    <form action="/sc/team/#(team.id)/join/#(user.id)" method="post">
+                        <input class="button-primary" type="submit" value="Enrole"/>
+                    </form>
+                    }
+                </td>
+            </tr>
+            
+            }
+        </tbody>
+    </table>
+</div>
+
+}
+
+
+
+}

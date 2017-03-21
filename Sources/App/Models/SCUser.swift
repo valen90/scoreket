@@ -21,12 +21,14 @@ final class SCUser: Model, User{
     var email: String
     var password: String
     var score: Int
+    var scteam_id: Int
     
-    init(nickname: String, email: String, password: String, score: Int = 0) {
+    init(nickname: String, email: String, password: String, score: Int = 0, scteam_id: Int = 0) {
         self.nickname = nickname
         self.email = email
         self.password = BCrypt.hash(password: password)
         self.score = score
+        self.scteam_id = scteam_id
     }
     
     init (node: Node, in context: Context) throws {
@@ -35,6 +37,7 @@ final class SCUser: Model, User{
         email = try node.extract("email")
         password = try node.extract("password")
         score = try node.extract("score")
+        scteam_id = try node.extract("scteam_id")
     }
     
     func makeNode(context: Context) throws -> Node {
@@ -43,8 +46,21 @@ final class SCUser: Model, User{
             "nickname": nickname,
             "email": email,
             "password": password,
-            "score": score
+            "score": score,
+            "scteam_id": scteam_id
             ])
+    }
+    
+    func makeJSON() throws -> JSON {
+        let node = try Node(node: [
+            "id": id,
+            "nickname": nickname,
+            "email": email,
+            "password": password,
+            "score": score,
+            "scteam_id": try SCTeam.find(scteam_id)?.makeJSON()
+            ])
+        return try JSON(node: node)
     }
     
     static func prepare(_ database: Database) throws {
@@ -54,7 +70,7 @@ final class SCUser: Model, User{
             users.string("email")
             users.string("password")
             users.int("score")
-            
+            users.int("scteam_id")
         }
     }
     
@@ -63,7 +79,7 @@ final class SCUser: Model, User{
     }
     
     static func register(nickname: String, email: String, pass: String) throws -> SCUser{
-        var newUser = try SCUser(nickname: nickname, email: email, password: pass)
+        var newUser = SCUser(nickname: nickname, email: email, password: pass)
         if try SCUser.query().filter("nickname", newUser.nickname).first() == nil{
             try newUser.save()
             return newUser
@@ -72,6 +88,16 @@ final class SCUser: Model, User{
         }
         
     }
+    
+    
+}
+
+extension SCUser {
+    func team() throws -> Parent<SCTeam> {
+        return try parent(Node(scteam_id))
+    }
+    
+    
 }
 
 extension SCUser: Authenticator {

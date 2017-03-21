@@ -1,8 +1,9 @@
 import Vapor
 import HTTP
 import Turnstile
+import Fluent
 
-final class SCController{
+final class UserController{
     func addRoutes(drop: Droplet){
         let sc = drop.grouped("sc")
         sc.get(handler: indexView)
@@ -12,21 +13,30 @@ final class SCController{
         sc.get("login", handler: loginView)
         sc.post("login", handler: login)
         sc.get("logout", handler: logout)
+        //sc.post(SCUser.self,"join",SCGame.self,handler: joinGame )    -------
+        //sc.get(SCTeam.self, "games", handler: gamesIndex)
     }
     
     func indexView(request: Request) throws -> ResponseRepresentable {
-        
-        let user = try? request.auth.user() as! SCUser
+        var user: SCUser? = nil
+        do {
+            user = try request.auth.user() as? SCUser
+        } catch { return Response(redirect: "/sc/login")}
         
         var name: String? = nil
+        var game: [SCGame]? = nil
+        
         if let user = user {
-            name = try user.nickname
+            name = user.nickname
+            game = try SCGame.query().all()
         }
+        
         
         let parameters = try Node(node: [
             "name": name,
+            "game": game?.makeJSON(),
             "authenticated": user != nil,
-            "user": user?.makeNode()
+            "user": user?.makeJSON()
             ])
         return try drop.view.make("index", parameters)
     }
@@ -81,6 +91,17 @@ final class SCController{
         return Response(redirect: "/sc")
     }
     
+    func joinGame(request: Request, scuser: SCUser, scgame: SCGame) throws -> ResponseRepresentable {
+        var pivot = Pivot<SCUser, SCGame> (scuser,scgame)
+        try pivot.save()
+        return scuser
+    }
+    
+    
+    func gamesIndex (request: Request, scteam: SCTeam) throws -> ResponseRepresentable{
+        let games = try scteam.games()
+        return try JSON(node: games.makeNode())
+    }
     
 }
 
