@@ -14,7 +14,7 @@
 </div>
 #if(authenticated) {
 <div class="row">
-    <h4>Tourtnaments !</h4>
+    <h4>Tournaments !</h4>
 </div>
 <div class="row">
     <table class="u-full-width">
