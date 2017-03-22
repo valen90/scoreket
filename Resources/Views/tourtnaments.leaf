@@ -14,34 +14,35 @@
 </div>
 #if(authenticated) {
 <div class="row">
-    <h4>Teams !</h4>
-    #if(actualTeam) {
-        <a class="button" href="/sc/team/#(user.id)/leave">Leave team</a>
-        } ##else() {
-            <a class="button" href="/sc/team/create">Create</a>
-        }
+    <h4>Tourtnaments !</h4>
 </div>
 <div class="row">
     <table class="u-full-width">
         <thead>
             <tr>
                 <th>Name</th>
-                <th>Enroll</th>
+                <th>Begins</th>
+                <th>Ends</th>
+                <th>Still open</th>
+                <th>Info</th>
+                <th>Start</th>
             </tr>
         </thead>
         <tbody>
-            #loop(teams, "team") {
+            #loop(tourt, "tourt") {
             <tr>
-                <td>#(team.teamName)</td>
+                <td>#(tourt.tourtName)</td>
+                <td>#(tourt.dateBeg)</td>
+                <td>#(tourt.dateEnd)</td>
+                <td>#(tourt.open)</td>
                 <td>
-                    #if(actualTeam) {
-                        Already on a team!
-                    } ##else() {
-                    <form action="/sc/team/#(team.id)/join/#(user.id)" method="post">
-                        <input class="button-primary" type="submit" value="Enroll"/>
-                    </form>
-                    }
+                    <a class="button" href="/sc/tourt/#(tourt.id)/games">Info</a>
                 </td>
+                #if(tourt.open) {
+                <td>
+                    <a class="button" href="/sc/tourt/#(tourt.id)/start">Start</a>
+                </td>
+                }
             </tr>
             
             }

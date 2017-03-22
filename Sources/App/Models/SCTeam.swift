@@ -11,7 +11,6 @@ import Fluent
 
 
 final class SCTeam: Model {
-    var exist: Bool = false
     var id: Node?
     
     var teamName: String

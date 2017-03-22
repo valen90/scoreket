@@ -6,13 +6,21 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="/styles/normalize.css">
         <link rel="stylesheet" href="/styles/skeleton.css">
-        <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet"     type="text/css">"
+        <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
     </head>
     <body>
         <div class="container">
             <div class="row">
                 <div class="u-full-width">
                     <h2>Scoreket <small>scores for Rocket League</small></h2>
+                </div>
+            </div>
+            <div class="row">
+                <div class="u-full-width">
+                    <a class="button" href="/sc">Index</a>
+                    <a class="button" href="/sc/games">My Games</a>
+                    <a class="button" href="/sc/team">Teams</a>
+                    <a class="button" href="/sc/tourt">Tourtnaments</a>
                 </div>
             </div>
             #import("body")

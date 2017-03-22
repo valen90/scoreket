@@ -14,7 +14,6 @@ import Auth
 
 
 final class SCUser: Model, User{
-    var exist: Bool = false
     
     var id: Node?
     var nickname: String

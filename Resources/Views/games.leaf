@@ -1,0 +1,77 @@
+#extend("base")
+
+#export("body") {
+
+<div class="row">
+    <div class="u-full-width">
+        #if(authenticated) {
+        <h5>Welcome #(user.nickname) - points: #(user.score) - team: #(user.scteam_id.teamName)</h5>
+        <a class="button" href="/sc/logout">Logout</a>
+        } ##else() {
+        <a class="button" href="/sc/login">Login</a>
+        <a class="button" href="/sc/register">Register</a>
+        }
+    </div>
+</div>
+#if(authenticated) {
+#if(tourt) {
+<div class="row">
+    <h4>Teams in the tourtnament</h4>
+    <ul>
+        #loop(teams, "team") {
+        <li>#(team.teamName)</li>
+        }
+    </ul>
+    #if(tourt.open) {
+    <form action="/sc/tourt/#(tourt.id)/add/#(user.scteam_id.id)" method="post">
+        <input class="button-primary" type="submit" value="Sign in Team"/>
+    </form>
+    <form action="/sc/tourt/#(tourt.id)/remove/#(user.scteam_id.id)" method="post">
+        <input class="button-primary" type="submit" value="Sign out Team"/>
+    </form>
+    }
+</div>
+}
+<div class="row">
+    <h4>Games #if(tourt) {in tourtnament #(tourt.tourtName)} !</h4>
+</div>
+<div class="row">
+    <table class="u-full-width">
+        <thead>
+            <tr>
+                <th>Team one</th>
+                <th>Team two</th>
+                <th>Date</th>
+                <th>Scores Team 1</th>
+                <th>Scores Team 2</th>
+            </tr>
+        </thead>
+        <tbody>
+            #loop(game, "game") {
+            <tr>
+                <td>#(game.team1.teamName)</td>
+                <td>#(game.team2.teamName)</td>
+                <td>#(game.date)</td>
+                <td>
+                    #if(game.ended) {
+                    #(game.result1)
+                    }
+                </td>
+                <td>
+                    #if(game.ended) {
+                    #(game.result2)
+                    }
+                </td>
+            </tr>
+            
+            }
+        </tbody>
+    </table>
+    
+</div>
+
+}
+
+
+
+}

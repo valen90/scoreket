@@ -13,8 +13,6 @@ final class UserController{
         sc.get("login", handler: loginView)
         sc.post("login", handler: login)
         sc.get("logout", handler: logout)
-        //sc.post(SCUser.self,"join",SCGame.self,handler: joinGame )    -------
-        //sc.get(SCTeam.self, "games", handler: gamesIndex)
     }
     
     func indexView(request: Request) throws -> ResponseRepresentable {
@@ -28,7 +26,7 @@ final class UserController{
         
         if let user = user {
             name = user.nickname
-            game = try SCGame.query().all()
+            game = try SCGame.query().filter("ended",false).all()
         }
         
         

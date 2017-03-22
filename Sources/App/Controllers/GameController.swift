@@ -17,6 +17,20 @@ final class GameController{
     }
     
     func indexView(request: Request) throws -> ResponseRepresentable{
-        return "hola"
+        var user: SCUser? = nil
+        do {
+            user = try request.auth.user() as? SCUser
+        } catch { return Response(redirect: "/sc/login")}
+        
+        let team:SCTeam? = try user?.team().first()
+        let games: [SCGame]? = try team?.games()
+        
+        let parameters = try Node(node: [
+            "authenticated": user != nil,
+            "game": games?.makeJSON(),
+            "user": user?.makeJSON()
+            ])
+        //return try JSON(node: games?.makeJSON())
+        return try drop.view.make("games", parameters)
     }
 }

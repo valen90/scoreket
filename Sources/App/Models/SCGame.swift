@@ -18,7 +18,18 @@ final class SCGame: Model {
     var ended: Bool
     var result1: Int
     var result2: Int
-    //var tourt: Node?
+    var sctourtnament_id: Int
+    
+    init(team1: Int, team2: Int, date: String, sctourtnament_id: Int ,ended: Bool = false,result1: Int = 0,result2: Int = 0) throws {
+        self.team1 = team1
+        self.team2 = team2
+        self.date = date
+        self.ended = ended
+        self.result1 = result1
+        self.result2 = result2
+        self.sctourtnament_id = sctourtnament_id
+        
+    }
     
     init(node: Node, in context: Context) throws {
         id = try node.extract("id")
@@ -28,7 +39,7 @@ final class SCGame: Model {
         ended = try node.extract("ended")
         result1 = try node.extract("result1")
         result2 = try node.extract("result2")
-        //tourt = try node.extract("tourt")
+        sctourtnament_id = try node.extract("sctourtnament_id")
     }
     
     func makeNode(context: Context) throws -> Node {
@@ -39,8 +50,8 @@ final class SCGame: Model {
                 "date": date,
                 "ended": ended,
                 "result1": result1,
-                "result2": result2
-                //"tourt": tourt
+                "result2": result2,
+                "sctourtnament_id": sctourtnament_id
             ])
     }
     
@@ -53,6 +64,7 @@ final class SCGame: Model {
             games.bool("ended")
             games.int("result1")
             games.int("result2")
+            games.int("sctourtnament_id")
         }
     }
     
@@ -64,8 +76,8 @@ final class SCGame: Model {
             "date": date,
             "ended": ended,
             "result1": result1,
-            "result2": result2
-            //"tourt": tourt
+            "result2": result2,
+            "sctourtnament_id": try SCTourtnament.find(sctourtnament_id)?.makeJSON()
             ])
         return try JSON(node: node)
     }
@@ -80,6 +92,10 @@ extension SCGame {
     func users() throws -> Siblings<SCTeam> {
         //let users: Siblings<SCUser> = try siblings()
         return try siblings()
+    }
+    
+    func tourtnament() throws -> SCTourtnament? {
+        return try parent(Node(sctourtnament_id), nil, SCTourtnament.self).get()
     }
 }
 
