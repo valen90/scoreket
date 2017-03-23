@@ -100,10 +100,10 @@ extension SCGame {
 }
 
 extension SCGame {
-    func userone() throws -> SCUser? {
-        return try parent(Node(team1), nil, SCUser.self).get()
+    func teamone() throws -> SCTeam? {
+        return try parent(Node(team1), nil, SCTeam.self).get()
     }
-    func usertwo() throws -> SCUser? {
-        return try parent(Node(team2), nil, SCUser.self).get()
+    func teamtwo() throws -> SCTeam? {
+        return try parent(Node(team2), nil, SCTeam.self).get()
     }
 }

@@ -96,7 +96,11 @@ extension SCUser {
         return try parent(Node(scteam_id))
     }
     
-    
+    func upgradePoints(points: Int)throws {
+        var user: SCUser = try SCUser.query().filter("id",id!).first()!
+        user.score += points
+        try user.save()
+    }
 }
 
 extension SCUser: Authenticator {

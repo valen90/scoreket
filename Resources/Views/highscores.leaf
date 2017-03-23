@@ -1,0 +1,47 @@
+#extend("base")
+
+#export("body") {
+
+<div class="row">
+    <div class="u-full-width">
+        #if(authenticated) {
+        <h5>Welcome #(user.nickname) - points: #(user.score) - team: #(user.scteam_id.teamName)</h5>
+        <a class="button" href="/sc/logout">Logout</a>
+        } ##else() {
+        <a class="button" href="/sc/login">Login</a>
+        <a class="button" href="/sc/register">Register</a>
+        }
+    </div>
+</div>
+#if(authenticated) {
+
+<div class="row">
+    <h4>Highscores! </h4>
+</div>
+<div class="row">
+    <table class="u-full-width">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Points</th>
+            </tr>
+        </thead>
+        <tbody>
+            #loop(users, "user") {
+            <tr>
+                <td>#(user.nickname)</td>
+                <td>#(user.score)</td>
+                
+            </tr>
+            
+            }
+        </tbody>
+    </table>
+    
+</div>
+
+}
+
+
+
+}

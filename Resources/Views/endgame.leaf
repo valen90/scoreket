@@ -1,0 +1,21 @@
+#extend("base")
+
+#export("body") {
+
+<div class="row">
+    <div class="u-full-width">
+        <form action="/sc/games/end/#(game.id)" method="post">
+            <label>#(teamone.teamName) points</label>
+            <input name="tone" class="u-full-width" type="tone"/>
+            <label>#(teamtwo.teamName) points</label>
+            <input name="ttwo" class="u-full-width" type="ttwo"/>
+            <input class="button-primary" type="submit" value="End game"/>
+        </form>
+        
+    </div>
+</div>
+
+
+
+
+}

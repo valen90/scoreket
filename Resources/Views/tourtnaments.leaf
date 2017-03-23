@@ -15,6 +15,7 @@
 #if(authenticated) {
 <div class="row">
     <h4>Tournaments !</h4>
+    <a class="button" href="/sc/tourt/create">Create Tournament</a>
 </div>
 <div class="row">
     <table class="u-full-width">
@@ -42,6 +43,8 @@
                 <td>
                     <a class="button" href="/sc/tourt/#(tourt.id)/start">Start</a>
                 </td>
+                } ##else() {
+                    <td></td>
                 }
             </tr>
             

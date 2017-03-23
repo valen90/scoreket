@@ -21,6 +21,7 @@
                     <a class="button" href="/sc/games">My Games</a>
                     <a class="button" href="/sc/team">Teams</a>
                     <a class="button" href="/sc/tourt">Tournaments</a>
+                    <a class="button" href="/sc/highscores">Highscores</a>
                 </div>
             </div>
             #import("body")

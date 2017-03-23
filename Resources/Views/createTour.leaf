@@ -1,0 +1,23 @@
+#extend("base")
+
+#export("body") {
+
+<div class="row">
+    <div class="u-full-width">
+        <form action="/sc/tourt/create" method="post">
+            <label>Tournament Name</label>
+            <input name="tournamentname" class="u-full-width" type="tournamentname"/>
+            <label>Begining date</label>
+            <input name="begdate" class="u-full-width" type="begdate"/>
+            <label>Ending date</label>
+            <input name="enddate" class="u-full-width" type="enddate"/>
+            <input class="button-primary" type="submit" value="Create"/>
+        </form>
+        
+    </div>
+</div>
+
+
+
+
+}

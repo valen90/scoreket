@@ -13,6 +13,7 @@ final class UserController{
         sc.get("login", handler: loginView)
         sc.post("login", handler: login)
         sc.get("logout", handler: logout)
+        sc.get("highscores", handler: highscores)
     }
     
     func indexView(request: Request) throws -> ResponseRepresentable {
@@ -99,6 +100,24 @@ final class UserController{
     func gamesIndex (request: Request, scteam: SCTeam) throws -> ResponseRepresentable{
         let games = try scteam.games()
         return try JSON(node: games.makeNode())
+    }
+    
+    func highscores(request: Request)throws -> ResponseRepresentable{
+        
+        var user: SCUser? = nil
+        do {
+            user = try request.auth.user() as? SCUser
+        } catch { return Response(redirect: "/sc/login")}
+        
+        let users = try SCUser.query().sort("score", Sort.Direction.descending).all()
+        
+        let parameters = try Node(node: [
+            "users": users.makeJSON(),
+            "authenticated": user != nil,
+            "user": user?.makeJSON()
+            ])
+        
+        return try drop.view.make("highscores", parameters)
     }
     
 }

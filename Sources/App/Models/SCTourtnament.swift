@@ -17,6 +17,14 @@ final class SCTourtnament: Model {
     var dateEnd: String
     var open: Bool
     
+    init(tourtName: String, dateBeg:String, dateEnd: String, open: Bool = true){
+        self.tourtName = tourtName
+        self.dateBeg = dateBeg
+        self.dateEnd = dateEnd
+        self.open = open
+    }
+    
+    
     init(node: Node, in context: Context) throws {
         id = try node.extract("id")
         

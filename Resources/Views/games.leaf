@@ -16,7 +16,7 @@
 #if(authenticated) {
 #if(tourt) {
 <div class="row">
-    <h4>Teams in the tournaments</h4>
+    <h4>Teams in the tournament</h4>
     <ul>
         #loop(teams, "team") {
         <li>#(team.teamName)</li>
@@ -33,7 +33,7 @@
 </div>
 }
 <div class="row">
-    <h4>Games #if(tourt) {in tournaments #(tourt.tourtName)} !</h4>
+    <h4>Games #if(tourt) {in tournament #(tourt.tourtName)} !</h4>
 </div>
 <div class="row">
     <table class="u-full-width">
@@ -44,6 +44,7 @@
                 <th>Date</th>
                 <th>Scores Team 1</th>
                 <th>Scores Team 2</th>
+                <th>End game</th>
             </tr>
         </thead>
         <tbody>
@@ -60,6 +61,18 @@
                 <td>
                     #if(game.ended) {
                     #(game.result2)
+                    }
+                </td>
+                <td>
+                    #if(game) {
+                        #equal(game.ended, false) {
+                            #equal(game.team1.id, user.scteam_id.id) {
+                                <a class="button" href="/sc/games/end/#(game.id)">End game</a>
+                                }
+                                #equal(game.team2.id, user.scteam_id.id) {
+                                <a class="button" href="/sc/games/end/#(game.id)">End game</a>
+                                }
+                            }
                     }
                 </td>
             </tr>

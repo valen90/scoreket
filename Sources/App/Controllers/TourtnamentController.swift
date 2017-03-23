@@ -15,6 +15,8 @@ final class TourtnamentController{
     func addRoutes(drop: Droplet){
         let sc = drop.grouped("sc","tourt")
         sc.get(handler: indexView)
+        sc.get("create",handler: createTourView)
+        sc.post("create", handler: createTour)
         sc.get(SCTourtnament.self, "games", handler: showGames)
         sc.post(SCTourtnament.self, "add", SCTeam.self, handler: registerTeam)
         sc.post(SCTourtnament.self, "remove", SCTeam.self, handler: removeTeam)
@@ -36,6 +38,24 @@ final class TourtnamentController{
             ])
         
         return try drop.view.make("tourtnaments", parameters)
+    }
+    
+    func createTourView(request: Request)throws -> ResponseRepresentable{
+        return try drop.view.make("createTour")
+    }
+    
+    func createTour(request: Request)throws -> ResponseRepresentable{
+        guard let tourname = request.formURLEncoded?["tournamentname"]?.string,
+            let begdate = request.formURLEncoded?["begdate"]?.string,
+            let enddate = request.formURLEncoded?["enddate"]?.string
+            else {
+                return "Mising name or dates"
+        }
+
+        
+        var sctour: SCTourtnament = SCTourtnament(tourtName: tourname, dateBeg: begdate, dateEnd: enddate)
+        try sctour.save()
+        return Response(redirect: "/sc/tourt")
     }
     
     func showGames(request: Request, sctourt: SCTourtnament)throws -> ResponseRepresentable{
