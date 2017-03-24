@@ -107,8 +107,6 @@ final class TeamController{
             "wins": Int(vic),
             "loss": Int(gc-vic),
             "total": Int(gc),
-            "authenticated": user != nil,
-            "user": user?.makeJSON()
             ])
 
         return try drop.view.make("teaminfo",parameters)
@@ -123,7 +121,6 @@ final class TeamController{
         let parameters = try Node(node: [
             "teams": SCTeam.query().all().makeJSON(),
             "actualTeam": teamId,
-            "authenticated": user != nil,
             "user": user?.makeJSON()
             ])
         return try drop.view.make("teams", parameters)

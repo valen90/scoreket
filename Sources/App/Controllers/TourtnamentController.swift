@@ -22,7 +22,6 @@ final class TourtnamentController{
         let tourt: [SCTourtnament] = try SCTourtnament.query().all()
         
         let parameters = try Node(node: [
-            "authenticated": user != nil,
             "tourt": tourt.makeJSON(),
             "user": user?.makeJSON()
             ])
@@ -93,7 +92,6 @@ final class TourtnamentController{
             "teams": sctourt.teams().makeJSON(),
             "ended": ended,
             "winner": winner?.makeJSON(),
-            "authenticated": user != nil,
             "user": user?.makeJSON()
             ])
         return try drop.view.make("games", parameters)

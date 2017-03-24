@@ -74,11 +74,10 @@ final class GameController{
         let games: [SCGame]? = try team?.games().all()
         
         let parameters = try Node(node: [
-            "authenticated": user != nil,
             "game": games?.makeJSON(),
             "user": user?.makeJSON()
             ])
-        //return try JSON(node: games?.makeJSON())
+
         return try drop.view.make("games", parameters)
     }
 }

@@ -21,10 +21,9 @@ final class UserController{
         
         
         let parameters = try Node(node: [
+            "user": user?.makeJSON(),
             "name": name,
-            "game": game?.makeJSON(),
-            "authenticated": user != nil,
-            "user": user?.makeJSON()
+            "game": game?.makeJSON()
             ])
         return try drop.view.make("index", parameters)
     }
@@ -91,7 +90,6 @@ final class UserController{
         
         let parameters = try Node(node: [
             "users": users.makeJSON(),
-            "authenticated": user != nil,
             "user": user?.makeJSON()
             ])
         

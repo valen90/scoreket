@@ -3,16 +3,11 @@
 #export("body") {
 <div class="row">
     <div class="u-full-width">
-        #if(authenticated) {
         <h5>Welcome #(user.nickname) - points: #(user.score) - team: #(user.scteam_id.teamName)</h5>
         <a class="button" href="/sc/logout">Logout</a>
-        } ##else() {
-        <a class="button" href="/sc/login">Login</a>
-        <a class="button" href="/sc/register">Register</a>
-        }
+
     </div>
 </div>
-#if(authenticated) {
 <div class="row">
     <h4>Tournaments !</h4>
     <a class="button" href="/sc/tourt/create">Create Tournament</a>
@@ -52,9 +47,6 @@
         </tbody>
     </table>
 </div>
-
-}
-
 
 
 }
