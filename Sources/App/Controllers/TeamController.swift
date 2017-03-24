@@ -12,18 +12,8 @@ import Turnstile
 import Fluent
 
 final class TeamController{
-    func addRoutes(drop: Droplet){
-        let sc = drop.grouped("sc","team")
-        sc.get(handler: teamsView)
-        sc.post(handler: create)
-        sc.get("create", handler: createView)
-        sc.get(SCUser.self, "leave",handler: leaveTeam)
-        sc.get(SCTeam.self, "games", handler: gamesIndex)
-        sc.post(SCTeam.self,"join",SCUser.self,handler: joinTeam)
-        sc.get(SCTeam.self, "users", handler: userIndex)
-    }
 
-    func create(request: Request) throws -> ResponseRepresentable {
+    static func create(request: Request) throws -> ResponseRepresentable {
         var user: SCUser? = nil
         do {
             user = try request.auth.user() as? SCUser
@@ -40,37 +30,91 @@ final class TeamController{
         return Response(redirect: "/sc/team")
     }
     
-    func leaveTeam(request: Request , scuser: SCUser) throws -> ResponseRepresentable {
-        var newUser: SCUser = try SCUser.query().filter("id", scuser.id!).first()!
+    static func leaveTeam(request: Request , scuser: SCUser) throws -> ResponseRepresentable {
+        var newUser: SCUser = scuser
+        //let scteam = try SCTeam.find(scuser.scteam_id)
         newUser.scteam_id = 0
         try newUser.save()
+        /*let users: [SCUser]? = try scteam?.users().all()
+        
+        if ((users?.count)! <= 0) {
+            let g :[SCGame]? = try scteam?.games().all()
+            for gi in g! {
+                try gi.deletegame()
+            }
+            try scteam?.delete()
+        }
+        */
         return Response(redirect: "/sc/team")
     }
     
-    func createView(request: Request) throws -> ResponseRepresentable{
+    static func createView(request: Request) throws -> ResponseRepresentable{
         return try drop.view.make("createTeam")
     }
     
-    func gamesIndex (request: Request, scteam: SCTeam) throws -> ResponseRepresentable{
+    static func gamesIndex (request: Request, scteam: SCTeam) throws -> ResponseRepresentable{
         let games = try scteam.games()
-        return try JSON(node: games.makeNode())
+        return try JSON(node: games.all().makeNode())
     }
     
-    func joinTeam(request: Request, scteam: SCTeam, scuser: SCUser) throws -> ResponseRepresentable {
+    static func joinTeam(request: Request, scteam: SCTeam, scuser: SCUser) throws -> ResponseRepresentable {
         var user: SCUser = try SCUser.query().filter("id",scuser.id!).first()!
         user.scteam_id = (scteam.id?.int)!
         try user.save()
         return Response(redirect: "/sc/team")
     }
     
-    func userIndex(request: Request, scteam: SCTeam) throws -> ResponseRepresentable {
+    static func userIndex(request: Request, scteam: SCTeam) throws -> ResponseRepresentable {
         let users = try scteam.users()
         return try JSON (node: [
                 users.all().makeNode()
             ])
     }
     
-    func teamsView(request: Request) throws -> ResponseRepresentable {
+    static func teamInfo(request: Request, scteam: SCTeam) throws -> ResponseRepresentable{
+        var user: SCUser? = nil
+        do {
+            user = try request.auth.user() as? SCUser
+        } catch { return Response(redirect: "/sc/login")}
+        
+        let games = try scteam.games().all()
+        var vic = 0.0
+        var gc = 0.0
+        
+        for game in games{
+            if(game.ended){
+                if (game.team1 == scteam.id!.int){
+                    if(game.result1 > game.result2){
+                        vic+=1
+                    }
+                }else {
+                    if(game.result2 > game.result1){
+                        vic+=1
+                    }
+                }
+                gc+=1
+            }
+        }
+        
+        let ratio: Double = (vic/gc)*100.0
+        let r: String = String(format: "%.2f", ratio)
+        
+        let parameters = try Node(node: [
+            "team": scteam.makeJSON(),
+            "users": scteam.users().sort("score", Sort.Direction.descending).all().makeJSON(),
+            "games": games.makeJSON(),
+            "ratio": r,
+            "wins": Int(vic),
+            "loss": Int(gc-vic),
+            "total": Int(gc),
+            "authenticated": user != nil,
+            "user": user?.makeJSON()
+            ])
+
+        return try drop.view.make("teaminfo",parameters)
+    }
+    
+    static func teamsView(request: Request) throws -> ResponseRepresentable {
         var user: SCUser? = nil
         do {
             user = try request.auth.user() as? SCUser

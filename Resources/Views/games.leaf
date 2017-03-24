@@ -19,7 +19,7 @@
     <h4>Teams in the tournament</h4>
     <ul>
         #loop(teams, "team") {
-        <li>#(team.teamName)</li>
+        <li>#(team.teamName) #equal(team.id, winner.id) { - <b>WINNER!</b>}</li>
         }
     </ul>
     #if(tourt.open) {
@@ -34,6 +34,7 @@
 }
 <div class="row">
     <h4>Games #if(tourt) {in tournament #(tourt.tourtName)} !</h4>
+    #if(winner) {<h4><b>#(winner.teamName) wins!</b></h4>}
 </div>
 <div class="row">
     <table class="u-full-width">

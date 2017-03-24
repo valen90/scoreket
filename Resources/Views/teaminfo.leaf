@@ -1,0 +1,72 @@
+#extend("base")
+
+#export("body") {
+<div class="row">
+    <div class="u-full-width">
+        #if(authenticated) {
+        <h5>Welcome #(user.nickname) - points: #(user.score) - team: #(user.scteam_id.teamName)</h5>
+        <a class="button" href="/sc/logout">Logout</a>
+        } ##else() {
+        <a class="button" href="/sc/login">Login</a>
+        <a class="button" href="/sc/register">Register</a>
+        }
+    </div>
+</div>
+#if(authenticated) {
+<div class="row">
+    <h4>Team #(team.teamName) info ! - Winning ratio: #(ratio) % </h4>
+</div>
+<div class="row">
+    <table class="u-full-width">
+        <h4>Users!</h4>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Score</th>
+            </tr>
+        </thead>
+        <tbody>
+            #loop(users, "user") {
+            <tr>
+                <td>#(user.nickname)</td>
+                <td>#(user.score)</td>
+            </tr>
+            
+            }
+        </tbody>
+    </table>
+</div>
+<div class="row">
+    <table class="u-full-width">
+        <h4>Games !</h4>
+        <h5>Total games: #(total) - wins: #(wins) - losses: #(loss)</h5>
+        <thead>
+            <tr>
+                <th>Team 1</th>
+                <th>Team 2</th>
+                <th>Date</th>
+                <th>Score team 1</th>
+                <th>Score team 2</th>
+            </tr>
+        </thead>
+        <tbody>
+            #loop(games, "game") {
+            #if(game.ended) {
+            <tr>
+                <td>#(game.team1.teamName)</td>
+                <td>#(game.team2.teamName)</td>
+                <td>#(game.date)</td>
+                <td>#(game.result1)</td>
+                <td>#(game.result2)</td>
+            </tr>
+            }
+            }
+        </tbody>
+    </table>
+</div>
+
+}
+
+
+
+}

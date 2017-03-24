@@ -27,6 +27,7 @@
             <tr>
                 <th>Name</th>
                 <th>Enroll</th>
+                <th>Info</th>
             </tr>
         </thead>
         <tbody>
@@ -42,6 +43,7 @@
                     </form>
                     }
                 </td>
+                <td><a class="button" href="/sc/team/#(team.id)/info">Info</a></td>
             </tr>
             
             }

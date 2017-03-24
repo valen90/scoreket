@@ -11,14 +11,8 @@ import HTTP
 import Fluent
 
 final class GameController{
-    func addRoutes(drop: Droplet){
-        let sc = drop.grouped("sc","games")
-        sc.get("end",SCGame.self, handler: endGameView)
-        sc.post("end",SCGame.self, handler: endGame)
-        sc.get(handler: indexView)
-    }
     
-    func endGameView(request: Request, scgame: SCGame)throws -> ResponseRepresentable{
+    static func endGameView(request: Request, scgame: SCGame)throws -> ResponseRepresentable{
         
         let scteamone: SCTeam? = try scgame.teamone()
         let scteamtwo: SCTeam? = try scgame.teamtwo()
@@ -33,22 +27,22 @@ final class GameController{
         return try drop.view.make("endgame",parameters)
     }
     
-    func endGame(request: Request, scgame: SCGame)throws -> ResponseRepresentable{
-        var game: SCGame? = try SCGame.query().filter("id",scgame.id!).first()
+    static func endGame(request: Request, scgame: SCGame)throws -> ResponseRepresentable{
+        var game = scgame
         
         guard let pointsone = request.formURLEncoded?["tone"]?.int,
             let pointstwo = request.formURLEncoded?["ttwo"]?.int
             else {
                 return "Mising points"
             }
-        game?.result1 = pointsone
-        game?.result2 = pointstwo
-        game?.ended = true
+        game.result1 = pointsone
+        game.result2 = pointstwo
+        game.ended = true
         
         var gr = pointsone
         var ls = pointstwo
-        var grtusers: [SCUser]? = try game?.teamone()?.users().all()
-        var lssusers: [SCUser]? = try game?.teamtwo()?.users().all()
+        var grtusers: [SCUser]? = try game.teamone()?.users().all()
+        var lssusers: [SCUser]? = try game.teamtwo()?.users().all()
         
         if(pointsone<pointstwo){
             gr = pointstwo
@@ -65,19 +59,19 @@ final class GameController{
             try user.upgradePoints(points: -5*(gr-ls))
         }
         
-        try game?.save()
+        try game.save()
         return Response(redirect: "/sc/games")
     }
     
     
-    func indexView(request: Request) throws -> ResponseRepresentable{
+    static func indexView(request: Request) throws -> ResponseRepresentable{
         var user: SCUser? = nil
         do {
             user = try request.auth.user() as? SCUser
         } catch { return Response(redirect: "/sc/login")}
         
         let team:SCTeam? = try user?.team().first()
-        let games: [SCGame]? = try team?.games()
+        let games: [SCGame]? = try team?.games().all()
         
         let parameters = try Node(node: [
             "authenticated": user != nil,

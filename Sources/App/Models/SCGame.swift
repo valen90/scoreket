@@ -89,13 +89,17 @@ final class SCGame: Model {
 }
 
 extension SCGame {
-    func users() throws -> Siblings<SCTeam> {
+    func teams() throws -> Siblings<SCTeam> {
         //let users: Siblings<SCUser> = try siblings()
         return try siblings()
     }
     
     func tourtnament() throws -> SCTourtnament? {
         return try parent(Node(sctourtnament_id), nil, SCTourtnament.self).get()
+    }
+    
+    func deletegame()throws {
+        try SCGame.find(self.id!)?.delete()
     }
 }
 

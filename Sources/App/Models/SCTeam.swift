@@ -49,9 +49,8 @@ extension SCTeam {
         return children()
     }
     
-    func games() throws -> [SCGame] {
-        let games: Siblings<SCGame> = try siblings()
-        return try games.all()
+    func games() throws -> Siblings<SCGame> {
+        return try siblings()
     }
 }
 

@@ -15,16 +15,16 @@ drop.preparations += Pivot<SCTourtnament, SCTeam>.self
 
 drop.addConfigurable(middleware: AuthMiddleware(user: SCUser.self), name: "auth")
 
-let sc = UserController()
-sc.addRoutes(drop: drop)
+let team = TeamRoutes()
+drop.collection(team)
 
-let game = GameController()
-game.addRoutes(drop: drop)
+let tourt = TournamentRoutes()
+drop.collection(tourt)
 
-let team = TeamController()
-team.addRoutes(drop: drop)
+let user = UserRoutes()
+drop.collection(user)
 
-let tourt = TourtnamentController()
-tourt.addRoutes(drop: drop)
+let game = GameRoutes()
+drop.collection(game)
 
 drop.run()
