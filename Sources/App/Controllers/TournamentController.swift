@@ -1,5 +1,5 @@
 //
-//  TourtnamentController.swift
+//  TournamentController.swift
 //  scoket
 //
 //  Created by Valen on 22/03/2017.
@@ -11,7 +11,7 @@ import HTTP
 import Fluent
 import Foundation
 
-final class TourtnamentController{
+final class TournamentController{
     
     static func indexView(request: Request)throws -> ResponseRepresentable{
         var user: SCUser? = nil
@@ -19,14 +19,14 @@ final class TourtnamentController{
             user = try request.auth.user() as? SCUser
         } catch { return Response(redirect: "/sc/login")}
         
-        let tourt: [SCTourtnament] = try SCTourtnament.query().all()
+        let tour: [SCTournament] = try SCTournament.query().all()
         
         let parameters = try Node(node: [
-            "tourt": tourt.makeJSON(),
+            "tour": tour.makeJSON(),
             "user": user?.makeJSON()
             ])
         
-        return try drop.view.make("tourtnaments", parameters)
+        return try drop.view.make("tournaments", parameters)
     }
     
     static func createTourView(request: Request)throws -> ResponseRepresentable{
@@ -42,13 +42,13 @@ final class TourtnamentController{
         }
 
         
-        var sctour: SCTourtnament = SCTourtnament(tourtName: tourname, dateBeg: begdate, dateEnd: enddate)
+        var sctour: SCTournament = SCTournament(tourName: tourname, dateBeg: begdate, dateEnd: enddate)
         try sctour.save()
-        return Response(redirect: "/sc/tourt")
+        return Response(redirect: "/sc/tour")
     }
     
-    static func showGames(request: Request, sctourt: SCTourtnament)throws -> ResponseRepresentable{
-        let games: [SCGame] = try sctourt.games().all()
+    static func showGames(request: Request, sctour: SCTournament)throws -> ResponseRepresentable{
+        let games: [SCGame] = try sctour.games().all()
         var user: SCUser? = nil
         do {
             user = try request.auth.user() as? SCUser
@@ -68,15 +68,19 @@ final class TourtnamentController{
         
         if games.count == ed && ed>0{
             ended = true
-            let teams: [SCTeam] = try sctourt.teams()
+            let teams: [SCTeam] = try sctour.teams()
             for team in teams{
                 var p = 0
-                let tgames: [SCGame] = try team.games().filter("sctourtnament_id", sctourt.id!).all()
+                let tgames: [SCGame] = try team.games().filter("sctournament_id", sctour.id!).all()
                 for tgame in tgames{
                     if tgame.team1 == team.id?.int{
-                        p += tgame.result1
+                        if tgame.result1 != nil{
+                            p += tgame.result1!
+                        }
                     }else {
-                        p += tgame.result2
+                        if tgame.result2 != nil{
+                            p += tgame.result2!
+                        }
                     }
                 }
                 punct.append(p)
@@ -88,8 +92,8 @@ final class TourtnamentController{
         
         let parameters = try Node(node: [
             "game": games.makeJSON(),
-            "tourt": sctourt.makeJSON(),
-            "teams": sctourt.teams().makeJSON(),
+            "tour": sctour.makeJSON(),
+            "teams": sctour.teams().makeJSON(),
             "ended": ended,
             "winner": winner?.makeJSON(),
             "user": user?.makeJSON()
@@ -97,28 +101,28 @@ final class TourtnamentController{
         return try drop.view.make("games", parameters)
     }
     
-    static func registerTeam (request: Request, sctourt: SCTourtnament, scteam: SCTeam) throws -> ResponseRepresentable{
-        if(try Pivot<SCTourtnament,SCTeam>.query().filter("scteam_id", scteam.id!).filter("sctourtnament_id", sctourt.id!).first() == nil){
-            var pivot = Pivot<SCTourtnament, SCTeam> (sctourt,scteam)
+    static func registerTeam (request: Request, sctour: SCTournament, scteam: SCTeam) throws -> ResponseRepresentable{
+        if(try Pivot<SCTournament,SCTeam>.query().filter("scteam_id", scteam.id!).filter("sctournament_id", sctour.id!).first() == nil){
+            var pivot = Pivot<SCTournament, SCTeam> (sctour,scteam)
             try pivot.save()
         }
-        return Response(redirect: "/sc/tourt/"+(sctourt.id?.string)!+"/games")
+        return Response(redirect: "/sc/tour/"+(sctour.id?.string)!+"/games")
     }
     
-    static func removeTeam(request: Request, sctourt: SCTourtnament, scteam: SCTeam) throws -> ResponseRepresentable{
-        let pivot = try Pivot<SCTourtnament,SCTeam>.query().filter("scteam_id", scteam.id!).filter("sctourtnament_id", sctourt.id!).first()
+    static func removeTeam(request: Request, sctour: SCTournament, scteam: SCTeam) throws -> ResponseRepresentable{
+        let pivot = try Pivot<SCTournament,SCTeam>.query().filter("scteam_id", scteam.id!).filter("sctournament_id", sctour.id!).first()
         if(pivot != nil){
             try pivot?.delete()
         }
-        return Response(redirect: "/sc/tourt/"+(sctourt.id?.string)!+"/games")
+        return Response(redirect: "/sc/tour/"+(sctour.id?.string)!+"/games")
     }
     
-    static func startTourtnament (request: Request, sctourt: SCTourtnament)throws -> ResponseRepresentable{
-        var tourt: SCTourtnament = try SCTourtnament.query().filter("id", sctourt.id!).first()!
-        tourt.open = false
-        try tourt.save()
+    static func startTournament (request: Request, sctour: SCTournament)throws -> ResponseRepresentable{
+        var tour: SCTournament = try SCTournament.query().filter("id", sctour.id!).first()!
+        tour.open = false
+        try tour.save()
         var game: SCGame?
-        var teams: [SCTeam] = try tourt.teams()
+        var teams: [SCTeam] = try tour.teams()
         var i = 0
         var j = 1
         
@@ -128,10 +132,22 @@ final class TourtnamentController{
         dateFormatterGet.dateFormat = "dd-MM-yyyy HH:mm:ss"
         print(dateFormatterGet.string(from: date))
         */
+        var now = Date()
+        var comp = DateComponents()
+        comp.weekday = 6
+        comp.hour = 17
+        comp.minute = 30
+        var comingFriday = Calendar.current.nextDate(after: now,
+                                                     matching: comp,
+                                                     matchingPolicy: .nextTime)
         
         while i < teams.count {
             while j < teams.count {
-                game = try SCGame(team1: (teams[i].id?.int)!,team2: (teams[j].id?.int)!,date: "21",sctourtnament_id: (tourt.id?.int)!)
+                game = try SCGame(team1: teams[i].id!.int! ,team2: teams[j].id!.int!,date: comingFriday!,sctournament_id: (tour.id?.int)!,result1: nil,result2: nil)
+                now = comingFriday!
+                comingFriday = Calendar.current.nextDate(after: now,
+                                                         matching: comp,
+                                                         matchingPolicy: .nextTime)
                 try game?.save()
                 var pivot = Pivot<SCTeam, SCGame> (teams[i],game!)
                 try pivot.save()
@@ -143,7 +159,7 @@ final class TourtnamentController{
             j = i+1
         }
         //return try JSON(node: game?.makeJSON())
-        return Response(redirect: "/sc/tourt/"+(sctourt.id?.string)!+"/games")
+        return Response(redirect: "/sc/tour/"+(sctour.id?.string)!+"/games")
     }
     
 }

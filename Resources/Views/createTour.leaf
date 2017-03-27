@@ -4,7 +4,7 @@
 
 <div class="row">
     <div class="u-full-width">
-        <form action="/sc/tourt/create" method="post">
+        <form action="/sc/tour/create" method="post">
             <label>Tournament Name</label>
             <input name="tournamentname" class="u-full-width" type="tournamentname"/>
             <label>Begining date</label>

@@ -10,7 +10,7 @@
 </div>
 <div class="row">
     <h4>Tournaments !</h4>
-    <a class="button" href="/sc/tourt/create">Create Tournament</a>
+    <a class="button" href="/sc/tour/create">Create Tournament</a>
 </div>
 <div class="row">
     <table class="u-full-width">
@@ -25,18 +25,18 @@
             </tr>
         </thead>
         <tbody>
-            #loop(tourt, "tourt") {
+            #loop(tour, "tour") {
             <tr>
-                <td>#(tourt.tourtName)</td>
-                <td>#(tourt.dateBeg)</td>
-                <td>#(tourt.dateEnd)</td>
-                <td>#(tourt.open)</td>
+                <td>#(tour.tourName)</td>
+                <td>#(tour.dateBeg)</td>
+                <td>#(tour.dateEnd)</td>
+                <td>#(tour.open)</td>
                 <td>
-                    <a class="button" href="/sc/tourt/#(tourt.id)/games">Info</a>
+                    <a class="button" href="/sc/tour/#(tour.id)/games">Info</a>
                 </td>
-                #if(tourt.open) {
+                #if(tour.open) {
                 <td>
-                    <a class="button" href="/sc/tourt/#(tourt.id)/start">Start</a>
+                    <a class="button" href="/sc/tour/#(tour.id)/start">Start</a>
                 </td>
                 } ##else() {
                     <td></td>

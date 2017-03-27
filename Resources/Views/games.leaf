@@ -9,7 +9,7 @@
     </div>
 </div>
 
-#if(tourt) {
+#if(tour) {
 <div class="row">
     <h4>Teams in the tournament</h4>
     <ul>
@@ -17,18 +17,18 @@
         <li>#(team.teamName) #equal(team.id, winner.id) { - <b>WINNER!</b>}</li>
         }
     </ul>
-    #if(tourt.open) {
-    <form action="/sc/tourt/#(tourt.id)/add/#(user.scteam_id.id)" method="post">
+    #if(tour.open) {
+    <form action="/sc/tour/#(tour.id)/add/#(user.scteam_id.id)" method="post">
         <input class="button-primary" type="submit" value="Sign in Team"/>
     </form>
-    <form action="/sc/tourt/#(tourt.id)/remove/#(user.scteam_id.id)" method="post">
+    <form action="/sc/tour/#(tour.id)/remove/#(user.scteam_id.id)" method="post">
         <input class="button-primary" type="submit" value="Sign out Team"/>
     </form>
     }
 </div>
 }
 <div class="row">
-    <h4>Games #if(tourt) {in tournament #(tourt.tourtName)} !</h4>
+    <h4>Games #if(tour) {in tournament #(tour.tourName)} !</h4>
     #if(winner) {<h4><b>#(winner.teamName) wins!</b></h4>}
 </div>
 <div class="row">

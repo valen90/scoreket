@@ -84,11 +84,11 @@ final class TeamController{
         for game in games{
             if(game.ended){
                 if (game.team1 == scteam.id!.int){
-                    if(game.result1 > game.result2){
+                    if(game.result1! > game.result2!){
                         vic+=1
                     }
                 }else {
-                    if(game.result2 > game.result1){
+                    if(game.result2! > game.result1!){
                         vic+=1
                     }
                 }
@@ -103,6 +103,7 @@ final class TeamController{
             "team": scteam.makeJSON(),
             "users": scteam.users().sort("score", Sort.Direction.descending).all().makeJSON(),
             "games": games.makeJSON(),
+            "user": user,
             "ratio": r,
             "wins": Int(vic),
             "loss": Int(gc-vic),
