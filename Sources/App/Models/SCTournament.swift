@@ -8,16 +8,17 @@
 
 import Vapor
 import Fluent
+import Foundation
 
 final class SCTournament: Model {
     var id: Node?
     
     var tourName: String
-    var dateBeg: String
-    var dateEnd: String
+    var dateBeg: Date?
+    var dateEnd: Date?
     var open: Bool
     
-    init(tourName: String, dateBeg:String, dateEnd: String, open: Bool = true){
+    init(tourName: String, dateBeg:Date?, dateEnd: Date?, open: Bool = true){
         self.tourName = tourName
         self.dateBeg = dateBeg
         self.dateEnd = dateEnd
@@ -29,8 +30,8 @@ final class SCTournament: Model {
         id = try node.extract("id")
         
         tourName = try node.extract("tourName")
-        dateBeg = try node.extract("dateBeg")
-        dateEnd = try node.extract("dateEnd")
+        dateBeg = try node.extract("dateBeg", transform: SCGame.dateFromString)
+        dateEnd = try node.extract("dateEnd", transform: SCGame.dateFromString)
         open = try node.extract("open")
     }
     
@@ -38,8 +39,8 @@ final class SCTournament: Model {
         return try Node(node: [
                 "id": id,
                 "tourName": tourName,
-                "dateBeg": dateBeg,
-                "dateEnd": dateEnd,
+                "dateBeg": SCGame.dateToString(dateBeg),
+                "dateEnd": SCGame.dateToString(dateEnd),
                 "open": open
             ])
     }
@@ -48,8 +49,8 @@ final class SCTournament: Model {
         try database.create("sctournaments") {tour in
             tour.id()
             tour.string("tourName")
-            tour.string("dateBeg")
-            tour.string("dateEnd")
+            tour.custom("dateBeg", type: "DATETIME", optional: true)
+            tour.custom("dateEnd", type: "DATETIME", optional: true)
             tour.bool("open")
         }
     }

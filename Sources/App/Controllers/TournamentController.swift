@@ -34,15 +34,14 @@ final class TournamentController{
     }
     
     static func createTour(request: Request)throws -> ResponseRepresentable{
-        guard let tourname = request.formURLEncoded?["tournamentname"]?.string,
-            let begdate = request.formURLEncoded?["begdate"]?.string,
-            let enddate = request.formURLEncoded?["enddate"]?.string
+        guard let tourname = request.formURLEncoded?["tournamentname"]?.string//,
+            //let begdate = request.formURLEncoded?["begdate"]?.string,
+            //let enddate = request.formURLEncoded?["enddate"]?.string
             else {
                 return "Mising name or dates"
         }
 
-        
-        var sctour: SCTournament = SCTournament(tourName: tourname, dateBeg: begdate, dateEnd: enddate)
+        var sctour: SCTournament = SCTournament(tourName: tourname, dateBeg: nil, dateEnd: nil)
         try sctour.save()
         return Response(redirect: "/sc/tour")
     }
@@ -120,7 +119,7 @@ final class TournamentController{
     static func startTournament (request: Request, sctour: SCTournament)throws -> ResponseRepresentable{
         var tour: SCTournament = try SCTournament.query().filter("id", sctour.id!).first()!
         tour.open = false
-        try tour.save()
+        
         var game: SCGame?
         var teams: [SCTeam] = try tour.teams()
         var i = 0
@@ -140,11 +139,12 @@ final class TournamentController{
         var comingFriday = Calendar.current.nextDate(after: now,
                                                      matching: comp,
                                                      matchingPolicy: .nextTime)
-        
+        tour.dateBeg = comingFriday!
         while i < teams.count {
             while j < teams.count {
                 game = try SCGame(team1: teams[i].id!.int! ,team2: teams[j].id!.int!,date: comingFriday!,sctournament_id: (tour.id?.int)!,result1: nil,result2: nil)
                 now = comingFriday!
+                tour.dateEnd = comingFriday!
                 comingFriday = Calendar.current.nextDate(after: now,
                                                          matching: comp,
                                                          matchingPolicy: .nextTime)
@@ -158,6 +158,8 @@ final class TournamentController{
             i += 1
             j = i+1
         }
+        
+        try tour.save()
         //return try JSON(node: game?.makeJSON())
         return Response(redirect: "/sc/tour/"+(sctour.id?.string)!+"/games")
     }
