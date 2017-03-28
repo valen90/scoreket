@@ -33,7 +33,7 @@ final class TeamController{
     static func leaveTeam(request: Request , scuser: SCUser) throws -> ResponseRepresentable {
         var newUser: SCUser = scuser
         //let scteam = try SCTeam.find(scuser.scteam_id)
-        newUser.scteam_id = 0
+        newUser.scteam_id = nil
         try newUser.save()
         /*let users: [SCUser]? = try scteam?.users().all()
         

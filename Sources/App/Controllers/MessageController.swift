@@ -18,7 +18,7 @@ final class MessageController{
         } catch { return Response(redirect: "/sc/login")}
         
         var mes: [Message]? = []
-        let team: SCTeam? = try (user?.team().first())
+        let team: SCTeam? = try (user?.team()?.first())
         if team != nil{
             mes = try team?.messages().all()
         }

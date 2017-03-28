@@ -67,7 +67,7 @@ final class GameController{
             user = try request.auth.user() as? SCUser
         } catch { return Response(redirect: "/sc/login")}
         
-        let te = try user?.team().first()
+        let te = try user?.team()?.first()
         var mesteam: SCTeam
         if try scgame.teamone()?.id == te?.id {
             mesteam = try scgame.teamtwo()!
@@ -126,7 +126,7 @@ final class GameController{
             user = try request.auth.user() as? SCUser
         } catch { return Response(redirect: "/sc/login")}
         
-        let team:SCTeam? = try user?.team().first()
+        let team:SCTeam? = try user?.team()?.first()
         let games: [SCGame]? = try team?.games().all()
         
         let parameters = try Node(node: [

@@ -20,9 +20,9 @@ final class SCUser: Model, User{
     var email: String
     var password: String
     var score: Int
-    var scteam_id: Int
+    var scteam_id: Int?
     
-    init(nickname: String, email: String, password: String, score: Int = 0, scteam_id: Int = 0) {
+    init(nickname: String, email: String, password: String, score: Int = 0, scteam_id: Int? = nil) {
         self.nickname = nickname
         self.email = email
         self.password = BCrypt.hash(password: password)
@@ -51,13 +51,17 @@ final class SCUser: Model, User{
     }
     
     func makeJSON() throws -> JSON {
+        var team: SCTeam? = nil
+        if scteam_id != nil {
+            team = try SCTeam.find(scteam_id!)
+        }
         let node = try Node(node: [
             "id": id,
             "nickname": nickname,
             "email": email,
             "password": password,
             "score": score,
-            "scteam_id": try SCTeam.find(scteam_id)?.makeJSON()
+            "scteam_id": team?.makeNode()
             ])
         return try JSON(node: node)
     }
@@ -69,7 +73,7 @@ final class SCUser: Model, User{
             users.string("email")
             users.string("password")
             users.int("score")
-            users.integer("scteam_id", signed: false)
+            users.integer("scteam_id", signed: false, optional: true)
         }
         try database.foreign(
             parentTable: "scteams",
@@ -98,8 +102,12 @@ final class SCUser: Model, User{
 }
 
 extension SCUser {
-    func team() throws -> Parent<SCTeam> {
-        return try parent(Node(scteam_id))
+    func team() throws -> Parent<SCTeam>? {
+        var node: Parent<SCTeam>? = nil
+        if scteam_id != nil {
+            node = try parent(Node(scteam_id!))
+        }
+        return node
     }
     
     func upgradePoints(points: Int)throws {
