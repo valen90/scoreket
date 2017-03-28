@@ -11,7 +11,7 @@ import Fluent
 import Turnstile
 import TurnstileCrypto
 import Auth
-
+import Sugar
 
 final class SCUser: Model, User{
     
@@ -69,8 +69,14 @@ final class SCUser: Model, User{
             users.string("email")
             users.string("password")
             users.int("score")
-            users.int("scteam_id")
+            users.integer("scteam_id", signed: false)
         }
+        try database.foreign(
+            parentTable: "scteams",
+            parentPrimaryKey: "id",
+            childTable: "scusers",
+            childForeignKey: "scteam_id")
+        
     }
     
     static func revert(_ database: Database) throws {

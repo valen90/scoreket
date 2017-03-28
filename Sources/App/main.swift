@@ -6,10 +6,12 @@ import Foundation
 
 let drop = Droplet()
 try drop.addProvider(VaporMySQL.Provider)
-drop.preparations += SCUser.self
-drop.preparations += SCGame.self
+
 drop.preparations += SCTeam.self
+drop.preparations += SCUser.self
 drop.preparations += SCTournament.self
+drop.preparations += SCGame.self
+drop.preparations += Message.self
 drop.preparations += Pivot<SCTeam,SCGame>.self
 drop.preparations += Pivot<SCTournament, SCTeam>.self
 
@@ -26,5 +28,8 @@ drop.collection(user)
 
 let game = GameRoutes()
 drop.collection(game)
+
+let message = MessageRoutes()
+drop.collection(message)
 
 drop.run()

@@ -20,6 +20,14 @@ class GameRoutes: RouteCollection {
             return try GameController.indexView(request: req)
         }
         
+        sc.get("accept",Message.self) { req, mes in
+            return try GameController.acceptGame(request: req,scmessage: mes )
+        }
+        
+        sc.get("decline",Message.self) { req, mes in
+            return try GameController.declineGame(request: req,scmessage: mes )
+        }
+        
         end.get(SCGame.self){ req, game in
             return try GameController.endGameView(request: req, scgame: game)
         }

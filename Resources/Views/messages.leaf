@@ -1,0 +1,44 @@
+#extend("base")
+
+#export("body") {
+
+<div class="row">
+    <div class="u-full-width">
+        <h5>Welcome #(user.nickname) - points: #(user.score) - team: #(user.scteam_id.teamName)</h5>
+        <a class="button" href="/sc/logout">Logout</a>
+    </div>
+</div>
+
+<div class="row">
+    <h4>Messages !</h4>
+</div>
+<div class="row">
+    <table class="u-full-width">
+        <thead>
+            <tr>
+                <th>Team one</th>
+                <th>Team two</th>
+                <th>Scores Team 1</th>
+                <th>Scores Team 2</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            #loop(message, "message") {
+            <tr>
+                <td>#(message.game.team1.teamName)</td>
+                <td>#(message.game.team2.teamName)</td>
+                <td>#(message.resultOne)</td>
+                <td>#(message.resultTwo)</td>
+                <td><a class="button" href="/sc/games/accept/#(message.id)">Accept</a></td>
+                <td><a class="button" href="/sc/games/decline/#(message.id)">Decline</a></td>
+            </tr>
+            
+            }
+        </tbody>
+    </table>
+    
+</div>
+
+}

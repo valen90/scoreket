@@ -52,6 +52,10 @@ extension SCTeam {
     func games() throws -> Siblings<SCGame> {
         return try siblings()
     }
+    
+    func messages() throws -> Children<Message> {
+        return children()
+    }
 }
 
 

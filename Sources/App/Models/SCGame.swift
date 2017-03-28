@@ -9,6 +9,7 @@
 import Vapor
 import Fluent
 import Foundation
+import Sugar
 
 final class SCGame: Model {
     var id: Node?
@@ -59,14 +60,29 @@ final class SCGame: Model {
     static func prepare(_ database: Database) throws {
         try database.create("scgames") { games in
             games.id()
-            games.int("team1")
-            games.int("team2")
+            games.integer("team1", signed: false)
+            games.integer("team2", signed: false)
             games.custom("date",type: "TIMESTAMP")
             games.bool("ended")
             games.int("result1", optional: true)
             games.int("result2", optional: true)
-            games.int("sctournament_id")
+            games.integer("sctournament_id", signed: false)
         }
+        
+        try database.foreign(
+            parentTable: "scteams",
+            parentPrimaryKey: "id",
+            childTable: "scgames",
+            childForeignKey: "team1")
+        
+        try database.driver.raw("ALTER TABLE scgames ADD CONSTRAINT scgames_scteams_id_team2_foreign FOREIGN KEY(team2) REFERENCES scteams(id)")
+        
+        try database.foreign(
+            parentTable: "sctournaments",
+            parentPrimaryKey: "id",
+            childTable: "scgames",
+            childForeignKey: "sctournament_id")
+        
     }
     
     func makeJSON() throws -> JSON {
@@ -91,7 +107,6 @@ final class SCGame: Model {
 
 extension SCGame {
     func teams() throws -> Siblings<SCTeam> {
-        //let users: Siblings<SCUser> = try siblings()
         return try siblings()
     }
     
@@ -120,6 +135,7 @@ extension SCGame {
         let dateformatter = DateFormatter()
         dateformatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         let val = dateformatter.date(from: string)
+        
         return val
     }
     
@@ -129,5 +145,12 @@ extension SCGame {
         dateformatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         let val = dateformatter.string(from: date)
         return val
+        /*
+        let dateFormatterGet = DateFormatter()
+        dateFormatterGet.dateFormat = "dd/MM/yyyy - HH:mm"
+        let d = dateFormatterGet.string(from: date)
+        
+        return d*/
+        
     }
 }

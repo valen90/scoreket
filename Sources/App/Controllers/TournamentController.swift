@@ -125,12 +125,6 @@ final class TournamentController{
         var i = 0
         var j = 1
         
-        /*let day = Int(Date().timeIntervalSince1970)
-        let date = Date(timeIntervalSince1970: TimeInterval(day))
-        let dateFormatterGet = DateFormatter()
-        dateFormatterGet.dateFormat = "dd-MM-yyyy HH:mm:ss"
-        print(dateFormatterGet.string(from: date))
-        */
         var now = Date()
         var comp = DateComponents()
         comp.weekday = 6
@@ -160,7 +154,6 @@ final class TournamentController{
         }
         
         try tour.save()
-        //return try JSON(node: game?.makeJSON())
         return Response(redirect: "/sc/tour/"+(sctour.id?.string)!+"/games")
     }
     
