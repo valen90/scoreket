@@ -1,10 +1,11 @@
 //
-//  TeamHelper.swift
+//  TournamentHelper.swift
 //  scoket
 //
 //  Created by Valen on 29/03/2017.
 //
 //
+
 import Vapor
 import Foundation
 import Fluent
