@@ -23,7 +23,7 @@ class TeamRoutes: RouteCollection {
             return try TeamController.create(request: req)
         }
         
-        sc.get(SCTeam.self, "info"){ req, te in
+        sc.get(Team.self, "info"){ req, te in
             return try TeamController.teamInfo(request: req, scteam: te)
         }
         
@@ -31,19 +31,19 @@ class TeamRoutes: RouteCollection {
             return try TeamController.createView(request: req)
         }
         
-        sc.get(SCUser.self, "leave"){ req, us in
+        sc.get(User.self, "leave"){ req, us in
             return try TeamController.leaveTeam(request: req, scuser: us)
         }
         
-        sc.get(SCTeam.self, "games"){ req, te in
+        sc.get(Team.self, "games"){ req, te in
             return try TeamController.gamesIndex(request: req, scteam: te)
         }
         
-        sc.post(SCTeam.self, "join", SCUser.self){ req, te, us in
+        sc.post(Team.self, "join", User.self){ req, te, us in
             return try TeamController.joinTeam(request: req, scteam: te, scuser: us)
         }
         
-        sc.get(SCTeam.self, "users"){ req, te in
+        sc.get(Team.self, "users"){ req, te in
             return try TeamController.userIndex(request: req, scteam: te)
         }
     }

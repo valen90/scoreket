@@ -4,7 +4,7 @@
 
 <div class="row">
     <div class="u-full-width">
-        <h5>Welcome #(user.nickname) - points: #(user.score) - team: #(user.scteam_id.teamName)</h5>
+        <h5>Welcome #(user.nickname) - points: #(user.score) - team: #(user.team_id.teamName)</h5>
         <a class="button" href="/sc/logout">Logout</a>
     </div>
 </div>
@@ -18,11 +18,11 @@
         }
     </ul>
     #if(tour.open) {
-    #if(user.scteam_id) {
-    <form action="/sc/tour/#(tour.id)/add/#(user.scteam_id.id)" method="post">
+    #if(user.team_id) {
+    <form action="/sc/tour/#(tour.id)/add/#(user.team_id.id)" method="post">
         <input class="button-primary" type="submit" value="Sign in Team"/>
     </form>
-    <form action="/sc/tour/#(tour.id)/remove/#(user.scteam_id.id)" method="post">
+    <form action="/sc/tour/#(tour.id)/remove/#(user.team_id.id)" method="post">
         <input class="button-primary" type="submit" value="Sign out Team"/>
     </form>
     }
@@ -64,10 +64,10 @@
                 <td>
                     #if(game) {
                         #equal(game.ended, false) {
-                            #equal(game.team1.id, user.scteam_id.id) {
+                            #equal(game.team1.id, user.team_id.id) {
                                 <a class="button" href="/sc/games/end/#(game.id)">End game</a>
                                 }
-                                #equal(game.team2.id, user.scteam_id.id) {
+                                #equal(game.team2.id, user.team_id.id) {
                                 <a class="button" href="/sc/games/end/#(game.id)">End game</a>
                                 }
                             }

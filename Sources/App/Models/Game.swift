@@ -1,5 +1,5 @@
 //
-//  SCGame.swift
+//  Game.swift
 //  scoket
 //
 //  Created by Valen on 17/03/2017.
@@ -11,7 +11,7 @@ import Fluent
 import Foundation
 import Sugar
 
-final class SCGame: Model {
+final class Game: Model {
     var id: Node?
     
     var team1: Int
@@ -37,11 +37,11 @@ final class SCGame: Model {
         id = try node.extract("id")
         team1 = try node.extract("team1")
         team2 = try node.extract("team2")
-        date = try node.extract("date", transform: SCGame.dateFromString)!
+        date = try node.extract("date", transform: Game.dateFromString)!
         ended = try node.extract("ended")
         result1 = try node.extract("result1")
         result2 = try node.extract("result2")
-        sctournament_id = try node.extract("sctournament_id")
+        sctournament_id = try node.extract("tournament_id")
     }
     
     func makeNode(context: Context) throws -> Node {
@@ -49,16 +49,16 @@ final class SCGame: Model {
                 "id": id,
                 "team1": team1,
                 "team2": team2,
-                "date": SCGame.dateToString(date),
+                "date": Game.dateToString(date),
                 "ended": ended,
                 "result1": result1,
                 "result2": result2,
-                "sctournament_id": sctournament_id
+                "tournament_id": sctournament_id
             ])
     }
     
     static func prepare(_ database: Database) throws {
-        try database.create("scgames") { games in
+        try database.create("games") { games in
             games.id()
             games.integer("team1", signed: false)
             games.integer("team2", signed: false)
@@ -66,69 +66,69 @@ final class SCGame: Model {
             games.bool("ended")
             games.int("result1", optional: true)
             games.int("result2", optional: true)
-            games.integer("sctournament_id", signed: false)
+            games.integer("tournament_id", signed: false)
         }
         
         try database.foreign(
-            parentTable: "scteams",
+            parentTable: "teams",
             parentPrimaryKey: "id",
-            childTable: "scgames",
+            childTable: "games",
             childForeignKey: "team1")
         
-        try database.driver.raw("ALTER TABLE scgames ADD CONSTRAINT scgames_scteams_id_team2_foreign FOREIGN KEY(team2) REFERENCES scteams(id)")
+        try database.driver.raw("ALTER TABLE games ADD CONSTRAINT scgames_scteams_id_team2_foreign FOREIGN KEY(team2) REFERENCES teams(id)")
         
         try database.foreign(
-            parentTable: "sctournaments",
+            parentTable: "tournaments",
             parentPrimaryKey: "id",
-            childTable: "scgames",
-            childForeignKey: "sctournament_id")
+            childTable: "games",
+            childForeignKey: "tournament_id")
         
     }
     
     func makeJSON() throws -> JSON {
         let node = try Node(node: [
             "id": id,
-            "team1": try SCTeam.find(team1)?.makeJSON(),
-            "team2": try SCTeam.find(team2)?.makeJSON(),
-            "date": SCGame.dateToString(date),
+            "team1": try Team.find(team1)?.makeJSON(),
+            "team2": try Team.find(team2)?.makeJSON(),
+            "date": Game.dateToString(date),
             "ended": ended,
             "result1": result1,
             "result2": result2,
-            "sctournament_id": try SCTournament.find(sctournament_id)?.makeJSON()
+            "tournament_id": try Tournament.find(sctournament_id)?.makeJSON()
             ])
         return try JSON(node: node)
     }
     
     static func revert(_ database: Database) throws {
-        try database.delete("scgames")
+        try database.delete("games")
     }
     
 }
 
-extension SCGame {
-    func teams() throws -> Siblings<SCTeam> {
+extension Game {
+    func teams() throws -> Siblings<Team> {
         return try siblings()
     }
     
-    func tournament() throws -> SCTournament? {
-        return try parent(Node(sctournament_id), nil, SCTournament.self).get()
+    func tournament() throws -> Tournament? {
+        return try parent(Node(sctournament_id), nil, Tournament.self).get()
     }
     
     func deletegame()throws {
-        try SCGame.find(self.id!)?.delete()
+        try Game.find(self.id!)?.delete()
     }
 }
 
-extension SCGame {
-    func teamone() throws -> SCTeam? {
-        return try parent(Node(team1), nil, SCTeam.self).get()
+extension Game {
+    func teamone() throws -> Team? {
+        return try parent(Node(team1), nil, Team.self).get()
     }
-    func teamtwo() throws -> SCTeam? {
-        return try parent(Node(team2), nil, SCTeam.self).get()
+    func teamtwo() throws -> Team? {
+        return try parent(Node(team2), nil, Team.self).get()
     }
 }
 
-extension SCGame {
+extension Game {
     static func dateFromString(_ dateAsString: String?) -> Date? {
         guard let string = dateAsString else { return nil }
         

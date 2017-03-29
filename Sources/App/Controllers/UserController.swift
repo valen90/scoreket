@@ -6,17 +6,17 @@ import Fluent
 final class UserController{
         
     static func indexView(request: Request) throws -> ResponseRepresentable {
-        var user: SCUser? = nil
+        var user: User? = nil
         do {
-            user = try request.auth.user() as? SCUser
+            user = try request.auth.user() as? User
         } catch { return Response(redirect: "/sc/login")}
         
         var name: String? = nil
-        var game: [SCGame]? = nil
+        var game: [Game]? = nil
         
         if let user = user {
             name = user.nickname
-            game = try SCGame.query().filter("ended",false).all()
+            game = try Game.query().filter("ended",false).all()
         }
         
         
@@ -46,7 +46,7 @@ final class UserController{
                 return "Mising name, email or password"
         }
         
-        _ = try SCUser.register(nickname: nickname, email: email , pass: password)
+        _ = try User.register(nickname: nickname, email: email , pass: password)
         
         let credentials = UsernamePassword(username: nickname, password: password)
         try request.auth.login(credentials)
@@ -81,12 +81,12 @@ final class UserController{
     
     static func highscores(request: Request)throws -> ResponseRepresentable{
         
-        var user: SCUser? = nil
+        var user: User? = nil
         do {
-            user = try request.auth.user() as? SCUser
+            user = try request.auth.user() as? User
         } catch { return Response(redirect: "/sc/login")}
         
-        let users = try SCUser.query().sort("score", Sort.Direction.descending).all()
+        let users = try User.query().sort("score", Sort.Direction.descending).all()
         
         let parameters = try Node(node: [
             "users": users.makeJSON(),
@@ -99,8 +99,8 @@ final class UserController{
 }
 
 extension Request {
-    func scuser() throws -> SCUser {
+    func scuser() throws -> User {
         guard let json = json else {throw Abort.badRequest}
-        return try SCUser(node: json)
+        return try User(node: json)
     }
 }

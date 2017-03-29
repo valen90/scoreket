@@ -4,7 +4,7 @@
 
 <div class="row">
     <div class="u-full-width">
-        <h5>Welcome #(user.nickname) - points: #(user.score) - team: #(user.scteam_id.teamName)</h5>
+        <h5>Welcome #(user.nickname) - points: #(user.score) - team: #(user.team_id.teamName)</h5>
         <a class="button" href="/sc/logout">Logout</a>
 
     </div>

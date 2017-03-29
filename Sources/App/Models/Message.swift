@@ -28,7 +28,7 @@ final class Message: Model {
         game = try node.extract("game")
         resultOne = try node.extract("resultOne")
         resultTwo = try node.extract("resultTwo")
-        scteam_id = try node.extract("scteam_id")
+        scteam_id = try node.extract("team_id")
     }
     
     func makeNode(context: Context) throws -> Node {
@@ -37,17 +37,17 @@ final class Message: Model {
             "game": game,
             "resultOne": resultOne,
             "resultTwo": resultTwo,
-            "scteam_id": scteam_id
+            "team_id": scteam_id
             ])
     }
     
     func makeJSON() throws -> JSON {
         return try JSON(node: [
                 "id":id,
-                "game": try SCGame.find(Node(game))?.makeJSON(),
+                "game": try Game.find(Node(game))?.makeJSON(),
                 "resultOne": resultOne,
                 "resultTwo": resultTwo,
-                "scteam_id": try SCTeam.find(Node(scteam_id))?.makeJSON()
+                "team_id": try Team.find(Node(scteam_id))?.makeJSON()
             ])
     }
     
@@ -57,17 +57,17 @@ final class Message: Model {
             message.integer("game", signed: false)
             message.int("resultOne")
             message.int("resultTwo")
-            message.integer("scteam_id", signed: false)
+            message.integer("team_id", signed: false)
         }
         
         try database.foreign(
-            parentTable: "scteams",
+            parentTable: "teams",
             parentPrimaryKey: "id",
             childTable: "messages",
-            childForeignKey: "scteam_id")
+            childForeignKey: "team_id")
         
         try database.foreign(
-            parentTable: "scgames",
+            parentTable: "games",
             parentPrimaryKey: "id",
             childTable: "messages",
             childForeignKey: "game")
@@ -81,12 +81,12 @@ final class Message: Model {
 }
 
 extension Message {
-    func returnGame() throws -> SCGame? {
-        return try parent(Node(self.game),nil,SCGame.self).get()
+    func returnGame() throws -> Game? {
+        return try parent(Node(self.game),nil,Game.self).get()
     }
     
-    func returnTeam() throws -> SCTeam? {
-        return try parent(Node(self.scteam_id),nil,SCTeam.self).get()
+    func returnTeam() throws -> Team? {
+        return try parent(Node(self.scteam_id),nil,Team.self).get()
     }
 }
 

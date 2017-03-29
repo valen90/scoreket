@@ -28,11 +28,11 @@ class GameRoutes: RouteCollection {
             return try GameController.declineGame(request: req,scmessage: mes )
         }
         
-        end.get(SCGame.self){ req, game in
+        end.get(Game.self){ req, game in
             return try GameController.endGameView(request: req, scgame: game)
         }
         
-        end.post(SCGame.self){ req, game in
+        end.post(Game.self){ req, game in
             return try GameController.endGame(request: req, scgame: game)
         }
     }

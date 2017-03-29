@@ -12,13 +12,13 @@ import Fluent
 
 final class MessageController{
     static func indexView(request: Request) throws -> ResponseRepresentable{
-        var user: SCUser? = nil
+        var user: User? = nil
         do {
-            user = try request.auth.user() as? SCUser
+            user = try request.auth.user() as? User
         } catch { return Response(redirect: "/sc/login")}
         
         var mes: [Message]? = []
-        let team: SCTeam? = try (user?.team()?.first())
+        let team: Team? = try (user?.team()?.first())
         if team != nil{
             mes = try team?.messages().all()
         }

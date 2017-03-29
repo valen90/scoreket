@@ -12,22 +12,34 @@ import Fluent
 final class GameHelper{
     
     static func updateScores(message: Message)throws {
-        var scGame: SCGame = try message.returnGame()!
+        var scGame: Game = try message.returnGame()!
         scGame.result1 = message.resultOne
         scGame.result2 = message.resultTwo
+        var teamW = try scGame.teamone()
+        var teamL = try scGame.teamtwo()
         
         var gr = message.resultOne
         var ls = message.resultTwo
-        var grtusers: [SCUser]? = try scGame.teamone()?.users().all()
-        var lssusers: [SCUser]? = try scGame.teamtwo()?.users().all()
+        var grtusers: [User]? = try scGame.teamone()?.users().all()
+        var lssusers: [User]? = try scGame.teamtwo()?.users().all()
         
         if(message.resultOne<message.resultTwo){
             gr = message.resultTwo
             ls = message.resultOne
-            let aux = grtusers
+            let userAux = grtusers
             grtusers = lssusers
-            lssusers = aux
+            lssusers = userAux
+            let teamAux = teamW
+            teamW = teamL
+            teamL = teamAux
         }
+        teamW?.wins += 1
+        teamL?.losses += 1
+        teamW?.totalGames += 1
+        teamL?.totalGames += 1
+        
+        try teamW?.save()
+        try teamL?.save()
         
         for user in grtusers!{
             var us = user
@@ -45,9 +57,9 @@ final class GameHelper{
         
     }
     
-    static func createMessage (user: SCUser, game: SCGame, pointsOne: Int, pointsTwo: Int)throws {
+    static func createMessage (user: User, game: Game, pointsOne: Int, pointsTwo: Int)throws {
         let te = try user.team()?.first()
-        var mesteam: SCTeam
+        var mesteam: Team
         if try game.teamone()?.id == te?.id {
             mesteam = try game.teamtwo()!
         }else {

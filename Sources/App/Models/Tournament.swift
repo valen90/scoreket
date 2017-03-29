@@ -1,5 +1,5 @@
 //
-//  SCTournament.swift
+//  Tournament.swift
 //  scoket
 //
 //  Created by Valen on 21/03/2017.
@@ -10,7 +10,7 @@ import Vapor
 import Fluent
 import Foundation
 
-final class SCTournament: Model {
+final class Tournament: Model {
     var id: Node?
     
     var tourName: String
@@ -34,8 +34,8 @@ final class SCTournament: Model {
         id = try node.extract("id")
         
         tourName = try node.extract("tourName")
-        dateBeg = try node.extract("dateBeg", transform: SCGame.dateFromString)
-        dateEnd = try node.extract("dateEnd", transform: SCGame.dateFromString)
+        dateBeg = try node.extract("dateBeg", transform: Game.dateFromString)
+        dateEnd = try node.extract("dateEnd", transform: Game.dateFromString)
         open = try node.extract("open")
         ended = try node.extract("ended")
         winner = try node.extract("winner")
@@ -45,8 +45,8 @@ final class SCTournament: Model {
         return try Node(node: [
                 "id": id,
                 "tourName": tourName,
-                "dateBeg": SCGame.dateToString(dateBeg),
-                "dateEnd": SCGame.dateToString(dateEnd),
+                "dateBeg": Game.dateToString(dateBeg),
+                "dateEnd": Game.dateToString(dateEnd),
                 "open": open,
                 "ended": ended,
                 "winner": winner
@@ -54,7 +54,7 @@ final class SCTournament: Model {
     }
     
     static func prepare(_ database: Database) throws {
-        try database.create("sctournaments") {tour in
+        try database.create("tournaments") {tour in
             tour.id()
             tour.string("tourName")
             tour.custom("dateBeg", type: "DATETIME", optional: true)
@@ -65,30 +65,30 @@ final class SCTournament: Model {
         }
         
         try database.foreign(
-            parentTable: "scteams",
+            parentTable: "teams",
             parentPrimaryKey: "id",
-            childTable: "sctournaments",
+            childTable: "tournaments",
             childForeignKey: "winner")
         
     }
     
     static func revert(_ database: Database) throws {
-        try database.delete("sctournaments")
+        try database.delete("tournaments")
     }
 }
 
-extension SCTournament {
-    func games() throws -> Children<SCGame> {
+extension Tournament {
+    func games() throws -> Children<Game> {
         return children()
     }
     
-    func teams() throws -> [SCTeam] {
-        let teams: Siblings<SCTeam> = try siblings()
+    func teams() throws -> [Team] {
+        let teams: Siblings<Team> = try siblings()
         return try teams.all()
     }
     
-    func getWinner() throws -> SCTeam? {
-        return try parent(Node(self.winner!),nil,SCTeam.self).get()
+    func getWinner() throws -> Team? {
+        return try parent(Node(self.winner!),nil,Team.self).get()
     }
 }
 

@@ -7,15 +7,15 @@ import Foundation
 let drop = Droplet()
 try drop.addProvider(VaporMySQL.Provider)
 
-drop.preparations += SCTeam.self
-drop.preparations += SCUser.self
-drop.preparations += SCTournament.self
-drop.preparations += SCGame.self
+drop.preparations += Team.self
+drop.preparations += User.self
+drop.preparations += Tournament.self
+drop.preparations += Game.self
 drop.preparations += Message.self
-drop.preparations += Pivot<SCTeam,SCGame>.self
-drop.preparations += Pivot<SCTournament, SCTeam>.self
+drop.preparations += Pivot<Team,Game>.self
+drop.preparations += Pivot<Tournament, Team>.self
 
-drop.addConfigurable(middleware: AuthMiddleware(user: SCUser.self), name: "auth")
+drop.addConfigurable(middleware: AuthMiddleware(user: User.self), name: "auth")
 
 let team = TeamRoutes()
 drop.collection(team)

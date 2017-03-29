@@ -12,9 +12,9 @@ import Fluent
 
 final class TournamentHelper{
     
-    static func createGames (tour: SCTournament) throws{
-        var game: SCGame?
-        var teams: [SCTeam] = try tour.teams()
+    static func createGames (tour: Tournament) throws{
+        var game: Game?
+        var teams: [Team] = try tour.teams()
         var i = 0
         var j = 1
         
@@ -29,7 +29,7 @@ final class TournamentHelper{
         tour.dateBeg = comingFriday!
         while i < teams.count {
             while j < teams.count {
-                game = try SCGame(
+                game = try Game(
                     team1: teams[i].id!.int!,
                     team2: teams[j].id!.int!,
                     date: comingFriday!,
@@ -43,9 +43,9 @@ final class TournamentHelper{
                                                          matching: comp,
                                                          matchingPolicy: .nextTime)  // Update the date for the next Friday
                 try game?.save()
-                var pivot = Pivot<SCTeam, SCGame> (teams[i],game!)
+                var pivot = Pivot<Team, Game> (teams[i],game!)
                 try pivot.save()
-                pivot = Pivot<SCTeam, SCGame> (teams[j],game!)
+                pivot = Pivot<Team, Game> (teams[j],game!)
                 try pivot.save()                                            //Update the pivot tables
                 j += 1
             }
@@ -54,13 +54,13 @@ final class TournamentHelper{
         }
     }
     
-    static func calculateWinner(tour: SCTournament)throws -> SCTeam?{
-        var winner: SCTeam? = nil
+    static func calculateWinner(tour: Tournament)throws -> Team?{
+        var winner: Team? = nil
         var punct: [Int] = []
-        let teams: [SCTeam] = try tour.teams()
+        let teams: [Team] = try tour.teams()
         for team in teams{
             var p = 0
-            let tgames: [SCGame] = try team.games().filter("sctournament_id", tour.id!).all()
+            let tgames: [Game] = try team.games().filter("tournament_id", tour.id!).all()
             for tgame in tgames{
                 if tgame.team1 == team.id?.int{
                     if tgame.result1 != nil{

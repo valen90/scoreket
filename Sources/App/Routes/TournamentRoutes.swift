@@ -28,19 +28,19 @@ class TournamentRoutes: RouteCollection {
             return try TournamentController.createTour(request: req)
         }
         
-        sc.get(SCTournament.self, "games"){req, tour in
+        sc.get(Tournament.self, "games"){req, tour in
             return try TournamentController.showGames(request: req, sctour: tour)
         }
         
-        sc.post(SCTournament.self, "add", SCTeam.self){req, tour, te in
+        sc.post(Tournament.self, "add", Team.self){req, tour, te in
             return try TournamentController.registerTeam(request: req, sctour: tour, scteam: te)
         }
         
-        sc.post(SCTournament.self, "remove", SCTeam.self){req, tour, te in
+        sc.post(Tournament.self, "remove", Team.self){req, tour, te in
             return try TournamentController.removeTeam(request: req, sctour: tour, scteam: te)
         }
         
-        sc.get(SCTournament.self, "start"){req, tour in
+        sc.get(Tournament.self, "start"){req, tour in
             return try TournamentController.startTournament(request: req, sctour: tour)
         }
     }

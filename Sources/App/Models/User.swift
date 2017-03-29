@@ -13,7 +13,7 @@ import TurnstileCrypto
 import Auth
 import Sugar
 
-final class SCUser: Model, User{
+final class User: Model, Auth.User{
     
     var id: Node?
     var nickname: String
@@ -36,7 +36,7 @@ final class SCUser: Model, User{
         email = try node.extract("email")
         password = try node.extract("password")
         score = try node.extract("score")
-        scteam_id = try node.extract("scteam_id")
+        scteam_id = try node.extract("team_id")
     }
     
     func makeNode(context: Context) throws -> Node {
@@ -46,14 +46,14 @@ final class SCUser: Model, User{
             "email": email,
             "password": password,
             "score": score,
-            "scteam_id": scteam_id
+            "team_id": scteam_id
             ])
     }
     
     func makeJSON() throws -> JSON {
-        var team: SCTeam? = nil
+        var team: Team? = nil
         if scteam_id != nil {
-            team = try SCTeam.find(scteam_id!)
+            team = try Team.find(scteam_id!)
         }
         let node = try Node(node: [
             "id": id,
@@ -61,35 +61,35 @@ final class SCUser: Model, User{
             "email": email,
             "password": password,
             "score": score,
-            "scteam_id": team?.makeNode()
+            "team_id": team?.makeNode()
             ])
         return try JSON(node: node)
     }
     
     static func prepare(_ database: Database) throws {
-        try database.create("scusers"){users in
+        try database.create("users"){users in
             users.id()
             users.string("nickname")
             users.string("email")
             users.string("password")
             users.int("score")
-            users.integer("scteam_id", signed: false, optional: true)
+            users.integer("team_id", signed: false, optional: true)
         }
         try database.foreign(
-            parentTable: "scteams",
+            parentTable: "teams",
             parentPrimaryKey: "id",
-            childTable: "scusers",
-            childForeignKey: "scteam_id")
+            childTable: "users",
+            childForeignKey: "team_id")
         
     }
     
     static func revert(_ database: Database) throws {
-        try database.delete("scusers")
+        try database.delete("users")
     }
     
-    static func register(nickname: String, email: String, pass: String) throws -> SCUser{
-        var newUser = SCUser(nickname: nickname, email: email, password: pass)
-        if try SCUser.query().filter("nickname", newUser.nickname).first() == nil{
+    static func register(nickname: String, email: String, pass: String) throws -> App.User{
+        var newUser = App.User(nickname: nickname, email: email, password: pass)
+        if try User.query().filter("nickname", newUser.nickname).first() == nil{
             try newUser.save()
             return newUser
         }else {
@@ -98,9 +98,9 @@ final class SCUser: Model, User{
     }
 }
 
-extension SCUser {
-    func team() throws -> Parent<SCTeam>? {
-        var node: Parent<SCTeam>? = nil
+extension App.User {
+    func team() throws -> Parent<Team>? {
+        var node: Parent<Team>? = nil
         if scteam_id != nil {
             node = try parent(Node(scteam_id!))
         }
@@ -108,13 +108,13 @@ extension SCUser {
     }
 }
 
-extension SCUser: Authenticator {
-    static func authenticate(credentials: Credentials) throws -> User {
-        var user: SCUser?
+extension App.User: Authenticator {
+    static func authenticate(credentials: Credentials) throws -> Auth.User {
+        var user: App.User?
         
         switch credentials{
         case let credentials as UsernamePassword:
-            let fetchedUser = try SCUser.query()
+            let fetchedUser = try User.query()
                 .filter("nickname", credentials.username)
                 .first()
             if let password = fetchedUser?.password,
@@ -123,7 +123,7 @@ extension SCUser: Authenticator {
                 user = fetchedUser
             }
         case let credentials as Identifier:
-            user = try SCUser.find(credentials.id)
+            user = try User.find(credentials.id)
         default:
             throw UnsupportedCredentialsError()
         }
@@ -134,7 +134,7 @@ extension SCUser: Authenticator {
         }
     }
     
-    static func register(credentials: Credentials) throws -> User {
+    static func register(credentials: Credentials) throws -> Auth.User {
         throw Abort.badRequest
     }
 }
