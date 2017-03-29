@@ -10,7 +10,9 @@
 </div>
 <div class="row">
     <h4>Tournaments !</h4>
-    <a class="button" href="/sc/tour/create">Create Tournament</a>
+    #equal(user.admin,"true") {
+        <a class="button" href="/sc/tour/create">Create Tournament</a>
+    }
 </div>
 <div class="row">
     <table class="u-full-width">
@@ -21,7 +23,7 @@
                 <th>Ends</th>
                 <th>Still open</th>
                 <th>Info</th>
-                <th>Start</th>
+                #equal(user.admin,"true") { <th>Start</th>}
             </tr>
         </thead>
         <tbody>
@@ -36,7 +38,7 @@
                 </td>
                 #if(tour.open) {
                 <td>
-                    <a class="button" href="/sc/tour/#(tour.id)/start">Start</a>
+                    #equal(user.admin,"true") { <a class="button" href="/sc/tour/#(tour.id)/start">Start</a>}
                 </td>
                 } ##else() {
                     <td></td>

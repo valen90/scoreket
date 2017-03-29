@@ -47,7 +47,6 @@
         </thead>
         <tbody>
             #loop(games, "game") {
-            #if(game.ended) {
             <tr>
                 <td>#(game.team1.teamName)</td>
                 <td>#(game.team2.teamName)</td>
@@ -55,7 +54,6 @@
                 <td>#(game.result1)</td>
                 <td>#(game.result2)</td>
             </tr>
-            }
             }
         </tbody>
     </table>

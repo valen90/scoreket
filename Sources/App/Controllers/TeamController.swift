@@ -66,7 +66,7 @@ final class TeamController{
             user = try request.auth.user() as? User
         } catch { return Response(redirect: "/sc/login")}
         
-        let games = try scteam.games().all()
+        let games = try scteam.games().filter("ended",true).all()
         
         let ratio: Double = (Double(scteam.wins)/Double(scteam.totalGames))*100
         let r: String = String(format: "%.2f", ratio)

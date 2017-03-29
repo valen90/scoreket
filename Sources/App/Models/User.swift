@@ -21,6 +21,7 @@ final class User: Model, Auth.User{
     var password: String
     var score: Int
     var scteam_id: Int?
+    private var admin: Bool = false
     
     init(nickname: String, email: String, password: String, score: Int = 0, scteam_id: Int? = nil) {
         self.nickname = nickname
@@ -37,6 +38,7 @@ final class User: Model, Auth.User{
         password = try node.extract("password")
         score = try node.extract("score")
         scteam_id = try node.extract("team_id")
+        admin = try node.extract("admin")
     }
     
     func makeNode(context: Context) throws -> Node {
@@ -46,7 +48,8 @@ final class User: Model, Auth.User{
             "email": email,
             "password": password,
             "score": score,
-            "team_id": scteam_id
+            "team_id": scteam_id,
+            "admin": admin
             ])
     }
     
@@ -61,7 +64,8 @@ final class User: Model, Auth.User{
             "email": email,
             "password": password,
             "score": score,
-            "team_id": team?.makeNode()
+            "team_id": team?.makeNode(),
+            "admin": admin
             ])
         return try JSON(node: node)
     }
@@ -74,6 +78,7 @@ final class User: Model, Auth.User{
             users.string("password")
             users.int("score")
             users.integer("team_id", signed: false, optional: true)
+            users.bool("admin")
         }
         try database.foreign(
             parentTable: "teams",
