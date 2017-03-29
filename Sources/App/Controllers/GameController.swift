@@ -28,91 +28,33 @@ final class GameController{
     }
     
     static func endGame(request: Request, scgame: SCGame)throws -> ResponseRepresentable{
-        //var game = scgame
         
         guard let pointsone = request.formURLEncoded?["tone"]?.int,
             let pointstwo = request.formURLEncoded?["ttwo"]?.int
             else {
                 return "Mising points"
             }
-        //game.result1 = pointsone
-        //game.result2 = pointstwo
-        //game.ended = true
-        
-        /*
-        var gr = pointsone
-        var ls = pointstwo
-        var grtusers: [SCUser]? = try game.teamone()?.users().all()
-        var lssusers: [SCUser]? = try game.teamtwo()?.users().all()
-        
-        if(pointsone<pointstwo){
-            gr = pointstwo
-            ls = pointsone
-            let aux = grtusers
-            grtusers = lssusers
-            lssusers = aux
-        }
-        
-        for user in grtusers!{
-            try user.upgradePoints(points: 10*(gr-ls))
-        }
-        for user in lssusers!{
-            try user.upgradePoints(points: -5*(gr-ls))
-        }
-        
-        try game.save()
-        */
         var user: SCUser? = nil
         do {
             user = try request.auth.user() as? SCUser
         } catch { return Response(redirect: "/sc/login")}
         
-        let te = try user?.team()?.first()
-        var mesteam: SCTeam
-        if try scgame.teamone()?.id == te?.id {
-            mesteam = try scgame.teamtwo()!
-        }else {
-            mesteam = try scgame.teamone()!
-        }
-        let gameInMessage: Message? = try Message.query().filter("game",(scgame.id?.int)!).first()
-        if gameInMessage == nil{
-            var mes = try Message(game: (scgame.id?.int)!, resultOne: pointsone, resultTwo: pointstwo, scteam_id: (mesteam.id?.int)!)
-            try mes.save()
-        }
+        try GameHelper.createMessage(user: user!, game: scgame, pointsOne: pointsone, pointsTwo: pointstwo)
         return Response(redirect: "/sc/games")
     }
     
     static func acceptGame(request: Request, scmessage: Message) throws -> ResponseRepresentable{
-        var scGame: SCGame = try scmessage.returnGame()!
-        
-        scGame.result1 = scmessage.resultOne
-        scGame.result2 = scmessage.resultTwo
-        
-        var gr = scmessage.resultOne
-        var ls = scmessage.resultTwo
-        var grtusers: [SCUser]? = try scGame.teamone()?.users().all()
-        var lssusers: [SCUser]? = try scGame.teamtwo()?.users().all()
-         
-        if(scmessage.resultOne<scmessage.resultTwo){
-            gr = scmessage.resultTwo
-            ls = scmessage.resultOne
-            let aux = grtusers
-            grtusers = lssusers
-            lssusers = aux
+        try GameHelper.updateScores(message: scmessage)
+        var sctour = try scmessage.returnGame()?.tournament()
+        let games: [SCGame] = try sctour!.games().all()
+        let endgames: [SCGame] = try sctour!.games().filter("ended", true).all()
+        if games.count == endgames.count && games.count>0{
+            sctour?.ended = true
+            sctour?.winner = try TournamentHelper.calculateWinner(tour: sctour!)?.id?.int
         }
-         
-        for user in grtusers!{
-            try user.upgradePoints(points: 10*(gr-ls))
-        }
-        for user in lssusers!{
-            try user.upgradePoints(points: -5*(gr-ls))
-        }
-        scGame.ended = true
-        try scmessage.delete()
-        try scGame.save()
+        try sctour?.save()
         
-
-        return Response(redirect: "/sc/games")
+        return Response(redirect: "/sc/messages")
     }
     
     static func declineGame(request: Request, scmessage: Message) throws -> ResponseRepresentable {

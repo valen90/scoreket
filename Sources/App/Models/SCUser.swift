@@ -95,10 +95,7 @@ final class SCUser: Model, User{
         }else {
             throw AccountTakenError()
         }
-        
     }
-    
-    
 }
 
 extension SCUser {
@@ -108,12 +105,6 @@ extension SCUser {
             node = try parent(Node(scteam_id!))
         }
         return node
-    }
-    
-    func upgradePoints(points: Int)throws {
-        var user: SCUser = try SCUser.query().filter("id",id!).first()!
-        user.score += points
-        try user.save()
     }
 }
 

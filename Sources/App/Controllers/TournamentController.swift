@@ -34,11 +34,9 @@ final class TournamentController{
     }
     
     static func createTour(request: Request)throws -> ResponseRepresentable{
-        guard let tourname = request.formURLEncoded?["tournamentname"]?.string//,
-            //let begdate = request.formURLEncoded?["begdate"]?.string,
-            //let enddate = request.formURLEncoded?["enddate"]?.string
+        guard let tourname = request.formURLEncoded?["tournamentname"]?.string
             else {
-                return "Mising name or dates"
+                return "Mising name"
         }
 
         var sctour: SCTournament = SCTournament(tourName: tourname, dateBeg: nil, dateEnd: nil)
@@ -48,52 +46,21 @@ final class TournamentController{
     
     static func showGames(request: Request, sctour: SCTournament)throws -> ResponseRepresentable{
         let games: [SCGame] = try sctour.games().all()
+        var winner: SCTeam? = nil
+        
         var user: SCUser? = nil
         do {
             user = try request.auth.user() as? SCUser
         } catch { return Response(redirect: "/sc/login")}
         
-        var ed = 0
-        var ended = false
-        var winner: SCTeam? = nil
-        
-        for game in games{
-            if game.ended{
-                ed += 1
-            }
+        if sctour.ended == true{
+            winner = try sctour.getWinner()
         }
-        
-        var punct: [Int] = []
-        
-        if games.count == ed && ed>0{
-            ended = true
-            let teams: [SCTeam] = try sctour.teams()
-            for team in teams{
-                var p = 0
-                let tgames: [SCGame] = try team.games().filter("sctournament_id", sctour.id!).all()
-                for tgame in tgames{
-                    if tgame.team1 == team.id?.int{
-                        if tgame.result1 != nil{
-                            p += tgame.result1!
-                        }
-                    }else {
-                        if tgame.result2 != nil{
-                            p += tgame.result2!
-                        }
-                    }
-                }
-                punct.append(p)
-            }
-            winner = teams[(punct.index(of: punct.max()!))!]
-        }
-        
-        
         
         let parameters = try Node(node: [
             "game": games.makeJSON(),
             "tour": sctour.makeJSON(),
             "teams": sctour.teams().makeJSON(),
-            "ended": ended,
             "winner": winner?.makeJSON(),
             "user": user?.makeJSON()
             ])
@@ -117,42 +84,9 @@ final class TournamentController{
     }
     
     static func startTournament (request: Request, sctour: SCTournament)throws -> ResponseRepresentable{
-        var tour: SCTournament = try SCTournament.query().filter("id", sctour.id!).first()!
+        var tour: SCTournament = sctour
         tour.open = false
-        
-        var game: SCGame?
-        var teams: [SCTeam] = try tour.teams()
-        var i = 0
-        var j = 1
-        
-        var now = Date()
-        var comp = DateComponents()
-        comp.weekday = 6
-        comp.hour = 17
-        comp.minute = 30
-        var comingFriday = Calendar.current.nextDate(after: now,
-                                                     matching: comp,
-                                                     matchingPolicy: .nextTime)
-        tour.dateBeg = comingFriday!
-        while i < teams.count {
-            while j < teams.count {
-                game = try SCGame(team1: teams[i].id!.int! ,team2: teams[j].id!.int!,date: comingFriday!,sctournament_id: (tour.id?.int)!,result1: nil,result2: nil)
-                now = comingFriday!
-                tour.dateEnd = comingFriday!
-                comingFriday = Calendar.current.nextDate(after: now,
-                                                         matching: comp,
-                                                         matchingPolicy: .nextTime)
-                try game?.save()
-                var pivot = Pivot<SCTeam, SCGame> (teams[i],game!)
-                try pivot.save()
-                pivot = Pivot<SCTeam, SCGame> (teams[j],game!)
-                try pivot.save()
-                j += 1
-            }
-            i += 1
-            j = i+1
-        }
-        
+        try TournamentHelper.createGames(tour: tour)
         try tour.save()
         return Response(redirect: "/sc/tour/"+(sctour.id?.string)!+"/games")
     }

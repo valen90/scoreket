@@ -17,12 +17,16 @@ final class SCTournament: Model {
     var dateBeg: Date?
     var dateEnd: Date?
     var open: Bool
+    var ended: Bool
+    var winner: Int?
     
-    init(tourName: String, dateBeg:Date?, dateEnd: Date?, open: Bool = true){
+    init(tourName: String, dateBeg:Date?, dateEnd: Date?, open: Bool = true, ended: Bool = false){
         self.tourName = tourName
         self.dateBeg = dateBeg
         self.dateEnd = dateEnd
         self.open = open
+        self.ended = ended
+        self.winner = nil
     }
     
     
@@ -33,6 +37,8 @@ final class SCTournament: Model {
         dateBeg = try node.extract("dateBeg", transform: SCGame.dateFromString)
         dateEnd = try node.extract("dateEnd", transform: SCGame.dateFromString)
         open = try node.extract("open")
+        ended = try node.extract("ended")
+        winner = try node.extract("winner")
     }
     
     func makeNode(context: Context) throws -> Node {
@@ -41,7 +47,9 @@ final class SCTournament: Model {
                 "tourName": tourName,
                 "dateBeg": SCGame.dateToString(dateBeg),
                 "dateEnd": SCGame.dateToString(dateEnd),
-                "open": open
+                "open": open,
+                "ended": ended,
+                "winner": winner
             ])
     }
     
@@ -52,7 +60,16 @@ final class SCTournament: Model {
             tour.custom("dateBeg", type: "DATETIME", optional: true)
             tour.custom("dateEnd", type: "DATETIME", optional: true)
             tour.bool("open")
+            tour.bool("ended")
+            tour.integer("winner", signed: false, optional: true)
         }
+        
+        try database.foreign(
+            parentTable: "scteams",
+            parentPrimaryKey: "id",
+            childTable: "sctournaments",
+            childForeignKey: "winner")
+        
     }
     
     static func revert(_ database: Database) throws {
@@ -68,6 +85,10 @@ extension SCTournament {
     func teams() throws -> [SCTeam] {
         let teams: Siblings<SCTeam> = try siblings()
         return try teams.all()
+    }
+    
+    func getWinner() throws -> SCTeam? {
+        return try parent(Node(self.winner!),nil,SCTeam.self).get()
     }
 }
 

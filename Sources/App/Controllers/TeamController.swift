@@ -32,19 +32,8 @@ final class TeamController{
     
     static func leaveTeam(request: Request , scuser: SCUser) throws -> ResponseRepresentable {
         var newUser: SCUser = scuser
-        //let scteam = try SCTeam.find(scuser.scteam_id)
         newUser.scteam_id = nil
         try newUser.save()
-        /*let users: [SCUser]? = try scteam?.users().all()
-        
-        if ((users?.count)! <= 0) {
-            let g :[SCGame]? = try scteam?.games().all()
-            for gi in g! {
-                try gi.deletegame()
-            }
-            try scteam?.delete()
-        }
-        */
         return Response(redirect: "/sc/team")
     }
     

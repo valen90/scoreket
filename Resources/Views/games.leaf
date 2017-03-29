@@ -18,12 +18,14 @@
         }
     </ul>
     #if(tour.open) {
+    #if(user.scteam_id) {
     <form action="/sc/tour/#(tour.id)/add/#(user.scteam_id.id)" method="post">
         <input class="button-primary" type="submit" value="Sign in Team"/>
     </form>
     <form action="/sc/tour/#(tour.id)/remove/#(user.scteam_id.id)" method="post">
         <input class="button-primary" type="submit" value="Sign out Team"/>
     </form>
+    }
     }
 </div>
 }
