@@ -75,7 +75,7 @@ final class TeamController{
             "team": scteam.makeJSON(),
             "users": scteam.users().sort("score", Sort.Direction.descending).all().makeJSON(),
             "games": games.makeJSON(),
-            "user": user,
+            "user": user?.makeJSON(),
             "ratio": r,
             "wins": scteam.wins,
             "loss": scteam.losses,

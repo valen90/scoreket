@@ -69,7 +69,6 @@ final class UserController{
             return Response(redirect: "/sc")
         } catch let e as TurnstileError {
             return e.description
-            
         }
     }
     
