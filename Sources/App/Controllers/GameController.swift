@@ -23,8 +23,8 @@ final class GameController{
             else {
                 return "Mising points"
             }
-        let pointsOne: Valid<DateValidator> = try pointsone.validated()
-        let pointsTwo: Valid<DateValidator> = try pointstwo.validated()
+        let pointsOne: Valid<NumberValidator> = try pointsone.validated()
+        let pointsTwo: Valid<NumberValidator> = try pointstwo.validated()
         var user: User? = nil
         do {
             user = try request.auth.user() as? User

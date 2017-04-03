@@ -44,12 +44,12 @@ final class TournamentController{
             else {
                 return "Mising name or dates"
             }
-        let validatedbDay: Valid<DateValidator> = try bday.validated()
-        let validatedbMonth: Valid<DateValidator> = try bmonth.validated()
-        let validatedbYear: Valid<DateValidator> = try byear.validated()
-        let validatedeDay: Valid<DateValidator> = try eday.validated()
-        let validatedeMonth: Valid<DateValidator> = try emonth.validated()
-        let validatedeYear: Valid<DateValidator> = try eyear.validated()
+        let validatedbDay: Valid<NumberValidator> = try bday.validated()
+        let validatedbMonth: Valid<NumberValidator> = try bmonth.validated()
+        let validatedbYear: Valid<NumberValidator> = try byear.validated()
+        let validatedeDay: Valid<NumberValidator> = try eday.validated()
+        let validatedeMonth: Valid<NumberValidator> = try emonth.validated()
+        let validatedeYear: Valid<NumberValidator> = try eyear.validated()
         
         let startDate = validatedbYear.value+"-"+validatedbMonth.value+"-"+validatedbDay.value+" 00:00:00"
         let endDate = validatedeYear.value+"-"+validatedeMonth.value+"-"+validatedeDay.value+" 23:59:00"
