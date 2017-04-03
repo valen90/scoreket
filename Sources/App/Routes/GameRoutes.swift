@@ -29,7 +29,7 @@ class GameRoutes: RouteCollection {
         }
         
         end.get(Game.self){ req, game in
-            return try GameController.endGameView(request: req, scgame: game)
+            return try GameController.endGameView(request: req, game: game)
         }
         
         end.post(Game.self){ req, game in

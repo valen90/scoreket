@@ -71,6 +71,10 @@ extension Team {
     func messages() throws -> Children<Message> {
         return children()
     }
+    
+    func tournament() throws -> Siblings<Tournament> {
+        return try siblings()
+    }
 }
 
 

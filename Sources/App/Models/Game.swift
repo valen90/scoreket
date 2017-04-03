@@ -21,8 +21,9 @@ final class Game: Model {
     var result1: Int?
     var result2: Int?
     var sctournament_id: Int
+    var winner: Int?
     
-    init(team1: Int, team2: Int, date: Date, sctournament_id: Int ,result1: Int?,result2: Int?, ended: Bool = false) throws {
+    init(team1: Int, team2: Int, date: Date, sctournament_id: Int ,result1: Int?,result2: Int?, ended: Bool = false, winner: Int? = nil) throws {
         self.team1 = team1
         self.team2 = team2
         self.date = date
@@ -30,6 +31,7 @@ final class Game: Model {
         self.result1 = result1
         self.result2 = result2
         self.sctournament_id = sctournament_id
+        self.winner = winner
         
     }
     
@@ -42,6 +44,7 @@ final class Game: Model {
         result1 = try node.extract("result1")
         result2 = try node.extract("result2")
         sctournament_id = try node.extract("tournament_id")
+        winner = try node.extract("winner")
     }
     
     func makeNode(context: Context) throws -> Node {
@@ -53,7 +56,8 @@ final class Game: Model {
                 "ended": ended,
                 "result1": result1,
                 "result2": result2,
-                "tournament_id": sctournament_id
+                "tournament_id": sctournament_id,
+                "winner": winner
             ])
     }
     
@@ -67,6 +71,7 @@ final class Game: Model {
             games.int("result1", optional: true)
             games.int("result2", optional: true)
             games.integer("tournament_id", signed: false)
+            games.integer("winner", signed: false, optional: true)
         }
         
         try database.foreign(
@@ -75,7 +80,9 @@ final class Game: Model {
             childTable: "games",
             childForeignKey: "team1")
         
+        // TODO: Consider doing a PR to Sugar
         try database.driver.raw("ALTER TABLE games ADD CONSTRAINT scgames_scteams_id_team2_foreign FOREIGN KEY(team2) REFERENCES teams(id)")
+        try database.driver.raw("ALTER TABLE games ADD CONSTRAINT scgames_scteams_id_winner_foreign FOREIGN KEY(winner) REFERENCES teams(id)")
         
         try database.foreign(
             parentTable: "tournaments",
@@ -86,6 +93,10 @@ final class Game: Model {
     }
     
     func makeJSON() throws -> JSON {
+        var winnerTeam: Team? = nil
+        if winnerTeam != nil {
+            winnerTeam = try Team.find(winner!)
+        }
         let node = try Node(node: [
             "id": id,
             "team1": try Team.find(team1)?.makeJSON(),
@@ -94,7 +105,8 @@ final class Game: Model {
             "ended": ended,
             "result1": result1,
             "result2": result2,
-            "tournament_id": try Tournament.find(sctournament_id)?.makeJSON()
+            "tournament_id": try Tournament.find(sctournament_id)?.makeJSON(),
+            "winner": winnerTeam?.makeJSON()
             ])
         return try JSON(node: node)
     }
@@ -110,8 +122,8 @@ extension Game {
         return try siblings()
     }
     
-    func tournament() throws -> Tournament? {
-        return try parent(Node(sctournament_id), nil, Tournament.self).get()
+    func tournament() throws -> Tournament {
+        return try parent(Node(sctournament_id), nil, Tournament.self).get()!
     }
     
     func deletegame()throws {
@@ -125,6 +137,9 @@ extension Game {
     }
     func teamtwo() throws -> Team? {
         return try parent(Node(team2), nil, Team.self).get()
+    }
+    func getWinner() throws -> Team? {
+        return try parent(Node(winner!), nil, Team.self).get()
     }
 }
 
@@ -145,12 +160,6 @@ extension Game {
         dateformatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         let val = dateformatter.string(from: date)
         return val
-        /*
-        let dateFormatterGet = DateFormatter()
-        dateFormatterGet.dateFormat = "dd/MM/yyyy - HH:mm"
-        let d = dateFormatterGet.string(from: date)
-        
-        return d*/
         
     }
 }

@@ -12,47 +12,38 @@ import Fluent
 
 final class GameController{
     
-    static func endGameView(request: Request, scgame: Game)throws -> ResponseRepresentable{
-        
-        let scteamOne: Team? = try scgame.teamone()
-        let scteamTwo: Team? = try scgame.teamtwo()
-        
-        let parameters = try Node(node: [
-            "teamone": try scteamOne?.makeNode(),
-            "teamtwo": try scteamTwo?.makeNode(),
-            "game": try scgame.makeJSON()
-            ])
-
-        
-        return try drop.view.make("endgame",parameters)
+    static func endGameView(request: Request, game: Game)throws -> ResponseRepresentable {
+        return try drop.view.make("endgame", game.makeJSON())
     }
     
     static func endGame(request: Request, scgame: Game)throws -> ResponseRepresentable{
         
-        guard let pointsone = request.formURLEncoded?["tone"]?.int,
-            let pointstwo = request.formURLEncoded?["ttwo"]?.int
+        guard let pointsone = request.formURLEncoded?["tone"]?.string,
+            let pointstwo = request.formURLEncoded?["ttwo"]?.string
             else {
                 return "Mising points"
             }
+        let pointsOne: Valid<DateValidator> = try pointsone.validated()
+        let pointsTwo: Valid<DateValidator> = try pointstwo.validated()
         var user: User? = nil
         do {
             user = try request.auth.user() as? User
-        } catch { return Response(redirect: "/sc/login")}
+        } catch { return Response(redirect: "/sc/login")}   
         
-        try GameHelper.createMessage(user: user!, game: scgame, pointsOne: pointsone, pointsTwo: pointstwo)
+        try GameHelper.createMessage(user: user!, game: scgame, pointsOne: pointsOne.value.int!, pointsTwo: pointsTwo.value.int!)
         return Response(redirect: "/sc/games")
     }
     
     static func acceptGame(request: Request, scmessage: Message) throws -> ResponseRepresentable{
         try GameHelper.updateScores(message: scmessage)
-        var sctour = try scmessage.returnGame()?.tournament()
-        let games: [Game] = try sctour!.games().all()
-        let endgames: [Game] = try sctour!.games().filter("ended", true).all()
-        if games.count == endgames.count && games.count>0{
-            sctour?.ended = true
-            sctour?.winner = try TournamentHelper.calculateWinner(tour: sctour!)?.id?.int
+    
+        var sctour: Tournament = try scmessage.returnGame().tournament()
+        
+        if try sctour.games().filter("ended", false).count() == 0 {
+            sctour.ended = true
+            sctour.winner = try TournamentHelper.calculateWinner(tour: sctour)
+            try sctour.save()
         }
-        try sctour?.save()
         
         return Response(redirect: "/sc/messages")
     }

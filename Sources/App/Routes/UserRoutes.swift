@@ -6,9 +6,7 @@ class UserRoutes: RouteCollection {
     typealias Wrapped = HTTP.Responder
     func build<B: RouteBuilder>(_ builder: B) where B.Value == Wrapped {
         let sc = builder.grouped("sc")
-        //let users = sc.grouped("users")
 
-        
         sc.get { request in
             return try UserController.indexView(request: request)
         }

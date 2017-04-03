@@ -11,71 +11,96 @@ import Foundation
 import Fluent
 
 final class TournamentHelper{
+    static let weekDay = 6 // Friday
+    static let hour = 17
+    static let minute = 30 // 17:30
+    static let topHour = 19 // 19:30
+    
     
     static func createGames (tour: Tournament) throws{
+        
+        let teams: [Team] = try tour.teams()
+        var copy: [Team] = teams
         var game: Game?
-        var teams: [Team] = try tour.teams()
+        var gameCalendar = TournamentHelper.getGamingCalendar(
+            begDay: tour.dateBeg!,
+            endDay: tour.dateEnd!)
         var i = 0
         var j = 1
+        var teamOne: Team
+        var teamTwo: Team
         
-        var now = Date()
-        var comp = DateComponents()
-        comp.weekday = 6 //Friday
-        comp.hour = 17
-        comp.minute = 30
-        var comingFriday = Calendar.current.nextDate(after: now,
-                                                     matching: comp,
-                                                     matchingPolicy: .nextTime)  // ComingFriday will be the Date corresponding to the next Friday at 17:30
-        tour.dateBeg = comingFriday!
-        while i < teams.count {
-            while j < teams.count {
-                game = try Game(
-                    team1: teams[i].id!.int!,
-                    team2: teams[j].id!.int!,
-                    date: comingFriday!,
-                    sctournament_id: (tour.id?.int)!,
-                    result1: nil,
-                    result2: nil)                                               //we create the game with the data of the teams
-                
-                now = comingFriday!
-                tour.dateEnd = comingFriday!
-                comingFriday = Calendar.current.nextDate(after: now,
-                                                         matching: comp,
-                                                         matchingPolicy: .nextTime)  // Update the date for the next Friday
-                try game?.save()
-                var pivot = Pivot<Team, Game> (teams[i],game!)
-                try pivot.save()
-                pivot = Pivot<Team, Game> (teams[j],game!)
-                try pivot.save()                                            //Update the pivot tables
-                j += 1
-            }
-            i += 1
-            j = i+1
+        
+        while gameCalendar.count-1 >= 0 {
+            teamOne = copy[i]
+            teamTwo = copy[j]
+            game = try Game(
+                team1: (teamOne.id?.int)!,
+                team2: (teamTwo.id?.int)!,
+                date: gameCalendar.remove(at: 0),
+                sctournament_id: (tour.id?.int)!,
+                result1: nil,
+                result2: nil)
+            
+            try game?.save()
+            var pivot = Pivot<Team, Game> (teamOne,game!)
+            try pivot.save()
+            pivot = Pivot<Team, Game> (teamTwo,game!)
+            try pivot.save()
+            i = (i+1) % (copy.count)
+            j = (i+1) % (copy.count)
         }
     }
     
-    static func calculateWinner(tour: Tournament)throws -> Team?{
-        var winner: Team? = nil
-        var punct: [Int] = []
-        let teams: [Team] = try tour.teams()
-        for team in teams{
-            var p = 0
-            let tgames: [Game] = try team.games().filter("tournament_id", tour.id!).all()
-            for tgame in tgames{
-                if tgame.team1 == team.id?.int{
-                    if tgame.result1 != nil{
-                        p += tgame.result1!
-                    }
-                }else {
-                    if tgame.result2 != nil{
-                        p += tgame.result2!
-                    }
-                }
-            }
-            punct.append(p)
+    static func calculateWinner(tour: Tournament)throws -> Int{
+        let tourId = tour.id!.int
+        
+        guard let database = drop.database else {
+            throw Abort.serverError
         }
-        winner = teams[(punct.index(of: punct.max()!))!]
-        return winner
+        
+        let node = try database.driver.raw("SELECT winner FROM games WHERE tournament_id = \(tourId ?? -1) GROUP BY winner ORDER BY COUNT(*) DESC LIMIT 1")
+        
+        guard case .array(let array) = node,
+            let winnerObject = array.first,
+            let winnerId = winnerObject["winner"]?.int
+        else {
+            throw Abort.serverError
+        }
+        
+        return winnerId
+    }
+    
+    /*
+     Gets the available dates for a game between the given dates
+     */
+    
+    static func getGamingCalendar(begDay: Date, endDay: Date) -> [Date]{
+        
+        var gameCalendar: [Date] = []
+        var iteratorDay = begDay
+        let endDay = endDay
+        var comp = DateComponents()
+        comp.weekday = TournamentHelper.weekDay
+        comp.hour = TournamentHelper.hour
+        comp.minute = TournamentHelper.minute
+        
+        while(iteratorDay <= endDay){
+            iteratorDay = Calendar.current.nextDate(
+                after: iteratorDay,
+                matching: comp,
+                matchingPolicy: .nextTime)!
+            
+            gameCalendar.append(iteratorDay)
+            
+            if comp.hour! < topHour {
+                comp.hour! += 1
+            } else {
+                comp.hour = TournamentHelper.hour
+            }
+            
+        }
+        return gameCalendar
     }
     
 }

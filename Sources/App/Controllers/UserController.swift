@@ -85,7 +85,7 @@ final class UserController{
             user = try request.auth.user() as? User
         } catch { return Response(redirect: "/sc/login")}
         
-        let users = try User.query().sort("score", Sort.Direction.descending).all()
+        let users = try User.query().sort("score", Sort.Direction.descending).limit(10).all()
         
         let parameters = try Node(node: [
             "users": users.makeJSON(),

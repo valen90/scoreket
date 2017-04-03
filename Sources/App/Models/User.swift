@@ -55,8 +55,8 @@ final class User: Model, Auth.User{
     
     func makeJSON() throws -> JSON {
         var team: Team? = nil
-        if scteam_id != nil {
-            team = try Team.find(scteam_id!)
+        if let scteam_id = scteam_id {
+            team = try Team.find(scteam_id)
         }
         let node = try Node(node: [
             "id": id,

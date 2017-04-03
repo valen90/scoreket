@@ -34,12 +34,29 @@ final class TournamentController{
     }
     
     static func createTour(request: Request)throws -> ResponseRepresentable{
-        guard let tourname = request.formURLEncoded?["tournamentname"]?.string
+        guard let tourname = request.formURLEncoded?["tournamentname"]?.string,
+            let bday = request.formURLEncoded?["begdateDay"]?.string,
+            let bmonth = request.formURLEncoded?["begdateMonth"]?.string,
+            let byear = request.formURLEncoded?["begdateYear"]?.string,
+            let eday = request.formURLEncoded?["enddateDay"]?.string,
+            let emonth = request.formURLEncoded?["enddateMonth"]?.string,
+            let eyear = request.formURLEncoded?["enddateYear"]?.string
             else {
-                return "Mising name"
-        }
-
-        var sctour: Tournament = Tournament(tourName: tourname, dateBeg: nil, dateEnd: nil)
+                return "Mising name or dates"
+            }
+        let validatedbDay: Valid<DateValidator> = try bday.validated()
+        let validatedbMonth: Valid<DateValidator> = try bmonth.validated()
+        let validatedbYear: Valid<DateValidator> = try byear.validated()
+        let validatedeDay: Valid<DateValidator> = try eday.validated()
+        let validatedeMonth: Valid<DateValidator> = try emonth.validated()
+        let validatedeYear: Valid<DateValidator> = try eyear.validated()
+        
+        let startDate = validatedbYear.value+"-"+validatedbMonth.value+"-"+validatedbDay.value+" 00:00:00"
+        let endDate = validatedeYear.value+"-"+validatedeMonth.value+"-"+validatedeDay.value+" 23:59:00"
+        let dateBeg = Game.dateFromString(startDate)
+        let dateEnd = Game.dateFromString(endDate)
+        
+        var sctour: Tournament = Tournament(tourName: tourname, dateBeg: dateBeg, dateEnd: dateEnd)
         try sctour.save()
         return Response(redirect: "/sc/tour")
     }

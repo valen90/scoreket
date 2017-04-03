@@ -53,6 +53,22 @@ final class Tournament: Model {
             ])
     }
     
+    func makeJSON() throws -> JSON {
+        var winnerTeam: Team? = nil
+        if winnerTeam != nil {
+            winnerTeam = try Team.find(winner!)
+        }
+        return try JSON(node: [
+            "id": id,
+            "tourName": tourName,
+            "dateBeg": Game.dateToString(dateBeg),
+            "dateEnd": Game.dateToString(dateEnd),
+            "open": open,
+            "ended": ended,
+            "winner": try winnerTeam?.makeJSON()
+            ])
+    }
+    
     static func prepare(_ database: Database) throws {
         try database.create("tournaments") {tour in
             tour.id()

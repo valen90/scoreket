@@ -3,6 +3,7 @@ import VaporMySQL
 import Auth
 import Fluent
 import Foundation
+import Flash
 
 let drop = Droplet()
 try drop.addProvider(VaporMySQL.Provider)

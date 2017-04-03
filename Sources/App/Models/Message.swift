@@ -81,8 +81,8 @@ final class Message: Model {
 }
 
 extension Message {
-    func returnGame() throws -> Game? {
-        return try parent(Node(self.game),nil,Game.self).get()
+    func returnGame() throws -> Game {
+        return try parent(Node(self.game),nil,Game.self).get()!
     }
     
     func returnTeam() throws -> Team? {

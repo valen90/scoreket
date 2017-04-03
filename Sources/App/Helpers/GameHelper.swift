@@ -10,9 +10,11 @@ import Vapor
 import Fluent
 
 final class GameHelper{
+    private static let multPointsWinner = 10
+    private static let multPointsLosers = -5
     
     static func updateScores(message: Message)throws {
-        var scGame: Game = try message.returnGame()!
+        var scGame: Game = try message.returnGame()
         scGame.result1 = message.resultOne
         scGame.result2 = message.resultTwo
         var teamW = try scGame.teamone()
@@ -37,21 +39,14 @@ final class GameHelper{
         teamL?.losses += 1
         teamW?.totalGames += 1
         teamL?.totalGames += 1
-        
+        scGame.winner = teamW?.id?.int
         try teamW?.save()
         try teamL?.save()
         
-        for user in grtusers!{
-            var us = user
-            us.score += 10*(gr-ls)
-            try us.save()
-        }
-        for user in lssusers!{
-            var us = user
-            us.score += -5*(gr-ls)
-            try us.save()
-        }
+        try GameHelper.addPoints(winners: grtusers!, losers: lssusers!, dif: (gr-ls))
+        
         scGame.ended = true
+        scGame.winner = teamW?.id?.int
         try message.delete()
         try scGame.save()
         
@@ -70,5 +65,19 @@ final class GameHelper{
             var mes = try Message(game: (game.id?.int)!, resultOne: pointsOne, resultTwo: pointsTwo, scteam_id: (mesteam.id?.int)!)
             try mes.save()
         }
+    }
+    
+    static func addPoints(winners: [User], losers: [User], dif: Int) throws{
+        for user in winners{
+            var us = user
+            us.score += ((GameHelper.multPointsWinner) * (dif))
+            try us.save()
+        }
+        for user in losers{
+            var us = user
+            us.score += ((GameHelper.multPointsLosers) * (dif))
+            try us.save()
+        }
+
     }
 }
