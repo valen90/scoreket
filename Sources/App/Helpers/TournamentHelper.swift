@@ -16,7 +16,9 @@ final class TournamentHelper{
     static let minute = 30 // 17:30
     static let topHour = 19 // 19:30
     
-    
+    /*
+     Create all the games for the dates availables
+     */
     static func createGames (tour: Tournament) throws{
         
         let teams: [Team] = try tour.teams()
@@ -51,7 +53,9 @@ final class TournamentHelper{
             j = (i+1) % (copy.count)
         }
     }
-    
+    /*
+     Gets the winner of the Tournament adding the winners of all the games
+     */
     static func calculateWinner(tour: Tournament)throws -> Int{
         let tourId = tour.id!.int
         

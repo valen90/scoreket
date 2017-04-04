@@ -25,7 +25,6 @@
                     <a class="button" href="/sc/messages">Messages</a>
                 </div>
             </div>
-            
             #import("body")
         </div>
     </body>
