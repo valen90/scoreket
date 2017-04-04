@@ -21,7 +21,8 @@ final class GameController{
         guard let pointsone = request.formURLEncoded?["tone"]?.string,
             let pointstwo = request.formURLEncoded?["ttwo"]?.string
             else {
-                return "Mising points"
+                let error = ["error":"Missing points"]
+                return try drop.view.make("error", error)
             }
         let pointsOne: Valid<NumberValidator> = try pointsone.validated()
         let pointsTwo: Valid<NumberValidator> = try pointstwo.validated()

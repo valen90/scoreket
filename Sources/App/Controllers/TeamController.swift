@@ -21,7 +21,8 @@ final class TeamController{
         
         guard let teamname = request.formURLEncoded?["teamname"]?.string
             else {
-                return "Mising team name"
+                let error = ["error":"Missing team name"]
+                return try drop.view.make("error", error)
         }
         var team = Team(teamName: teamname)
         try team.save()

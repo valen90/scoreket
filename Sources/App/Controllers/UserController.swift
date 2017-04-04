@@ -43,7 +43,8 @@ final class UserController{
             let password = request.formURLEncoded?["password"]?.string,
             let email = request.formURLEncoded?["email"]?.string
             else {
-                return "Mising name, email or password"
+                let error = ["error":"Missing name, password or mail"]
+                return try drop.view.make("error", error)
         }
         
         _ = try User.register(nickname: nickname, email: email , pass: password)
@@ -61,7 +62,8 @@ final class UserController{
     static func login(request: Request) throws -> ResponseRepresentable {
         guard let nickname = request.formURLEncoded?["nickname"]?.string,
             let password = request.formURLEncoded?["password"]?.string else {
-                return "Missing name or password"
+                let error = ["error":"Missing name or password"]
+                return try drop.view.make("error", error)
         }
         let credentials = UsernamePassword(username: nickname, password: password)
         do {

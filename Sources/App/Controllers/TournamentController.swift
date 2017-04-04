@@ -42,7 +42,8 @@ final class TournamentController{
             let emonth = request.formURLEncoded?["enddateMonth"]?.string,
             let eyear = request.formURLEncoded?["enddateYear"]?.string
             else {
-                return "Mising name or dates"
+                let error = ["error":"Missing name or dates"]
+                return try drop.view.make("error", error)
             }
         let validatedbDay: Valid<NumberValidator> = try bday.validated()
         let validatedbMonth: Valid<NumberValidator> = try bmonth.validated()
