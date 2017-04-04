@@ -24,14 +24,23 @@ final class GameController{
                 let error = ["error":"Missing points"]
                 return try drop.view.make("error", error)
             }
-        let pointsOne: Valid<NumberValidator> = try pointsone.validated()
-        let pointsTwo: Valid<NumberValidator> = try pointstwo.validated()
+        
         var user: User? = nil
         do {
             user = try request.auth.user() as? User
         } catch { return Response(redirect: "/sc/login")}   
         
-        try GameHelper.createMessage(user: user!, game: scgame, pointsOne: pointsOne.value.int!, pointsTwo: pointsTwo.value.int!)
+        do{
+            let pointsOne: Valid<NumberValidator> = try pointsone.validated()
+            let pointsTwo: Valid<NumberValidator> = try pointstwo.validated()
+            
+            try GameHelper.createMessage(user: user!, game: scgame, pointsOne: pointsOne.value.int!, pointsTwo: pointsTwo.value.int!)
+        
+        } catch let error as ValidationErrorProtocol {
+            let err = ["error":error.message]
+            return try drop.view.make("error", err)
+        }
+        
         return Response(redirect: "/sc/games")
     }
     

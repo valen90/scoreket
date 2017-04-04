@@ -45,20 +45,28 @@ final class TournamentController{
                 let error = ["error":"Missing name or dates"]
                 return try drop.view.make("error", error)
             }
-        let validatedbDay: Valid<NumberValidator> = try bday.validated()
-        let validatedbMonth: Valid<NumberValidator> = try bmonth.validated()
-        let validatedbYear: Valid<NumberValidator> = try byear.validated()
-        let validatedeDay: Valid<NumberValidator> = try eday.validated()
-        let validatedeMonth: Valid<NumberValidator> = try emonth.validated()
-        let validatedeYear: Valid<NumberValidator> = try eyear.validated()
+        do {
+            let validatedbDay: Valid<NumberValidator> = try bday.validated()
+            let validatedbMonth: Valid<NumberValidator> = try bmonth.validated()
+            let validatedbYear: Valid<NumberValidator> = try byear.validated()
+            let validatedeDay: Valid<NumberValidator> = try eday.validated()
+            let validatedeMonth: Valid<NumberValidator> = try emonth.validated()
+            let validatedeYear: Valid<NumberValidator> = try eyear.validated()
+            
+            let startDate = validatedbYear.value+"-"+validatedbMonth.value+"-"+validatedbDay.value+" 00:00:00"
+            
+            let endDate = validatedeYear.value+"-"+validatedeMonth.value+"-"+validatedeDay.value+" 23:59:00"
+            let dateBeg = Game.dateFromString(startDate)
+            let dateEnd = Game.dateFromString(endDate)
+            
+            var sctour: Tournament = Tournament(tourName: tourname, dateBeg: dateBeg, dateEnd: dateEnd)
+            try sctour.save()
+            
+        } catch let error as ValidationErrorProtocol {
+            let err = ["error":error.message]
+            return try drop.view.make("error", err)
+        }
         
-        let startDate = validatedbYear.value+"-"+validatedbMonth.value+"-"+validatedbDay.value+" 00:00:00"
-        let endDate = validatedeYear.value+"-"+validatedeMonth.value+"-"+validatedeDay.value+" 23:59:00"
-        let dateBeg = Game.dateFromString(startDate)
-        let dateEnd = Game.dateFromString(endDate)
-        
-        var sctour: Tournament = Tournament(tourName: tourname, dateBeg: dateBeg, dateEnd: dateEnd)
-        try sctour.save()
         return Response(redirect: "/sc/tour")
     }
     
