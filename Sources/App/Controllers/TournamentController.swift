@@ -60,10 +60,10 @@ final class TournamentController{
             
             guard let dateBeg = Game.dateFromString(startDate),
             let dateEnd = Game.dateFromString(endDate),
-            dateBeg.isAfter(dateEnd)
-                else{
-                    let error = ["error":"Dates not correct, End date should be after Begin date"]
-                    return try drop.view.make("error", error)
+            dateEnd.isAfter(dateBeg)
+            else{
+                let error = ["error":"Dates not correct, End date should be after Begin date"]
+                return try drop.view.make("error", error)
             }
             
             var sctour: Tournament = Tournament(tourName: tourname, dateBeg: dateBeg, dateEnd: dateEnd)
@@ -119,7 +119,13 @@ final class TournamentController{
     static func startTournament (request: Request, sctour: Tournament)throws -> ResponseRepresentable{
         var tour: Tournament = sctour
         tour.open = false
-        try TournamentHelper.createGames(tour: tour)
+        if (try tour.teams()).count > 1 {
+            try TournamentHelper.createGames(tour: tour)
+        }
+        else {
+            let error = ["error":"Not enought teams in the tournament"]
+            return try drop.view.make("error", error)
+        }
         try tour.save()
         return Response(redirect: "/sc/tour/"+(sctour.id?.string)!+"/games")
     }

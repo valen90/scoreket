@@ -80,9 +80,17 @@ final class Game: Model {
             childTable: "games",
             childForeignKey: "team1")
         
-        // TODO: Consider doing a PR to Sugar
-        try database.driver.raw("ALTER TABLE games ADD CONSTRAINT scgames_scteams_id_team2_foreign FOREIGN KEY(team2) REFERENCES teams(id)")
-        try database.driver.raw("ALTER TABLE games ADD CONSTRAINT scgames_scteams_id_winner_foreign FOREIGN KEY(winner) REFERENCES teams(id)")
+        try database.foreign(
+            parentTable: "teams",
+            parentPrimaryKey: "id",
+            childTable: "games",
+            childForeignKey: "team2")
+        
+        try database.foreign(
+            parentTable: "teams",
+            parentPrimaryKey: "id",
+            childTable: "games",
+            childForeignKey: "winner")
         
         try database.foreign(
             parentTable: "tournaments",
