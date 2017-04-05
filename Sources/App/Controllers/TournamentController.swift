@@ -10,6 +10,7 @@ import Vapor
 import HTTP
 import Fluent
 import Foundation
+import Sugar
 
 final class TournamentController{
     
@@ -56,8 +57,14 @@ final class TournamentController{
             let startDate = validatedbYear.value+"-"+validatedbMonth.value+"-"+validatedbDay.value+" 00:00:00"
             
             let endDate = validatedeYear.value+"-"+validatedeMonth.value+"-"+validatedeDay.value+" 23:59:00"
-            let dateBeg = Game.dateFromString(startDate)
-            let dateEnd = Game.dateFromString(endDate)
+            
+            guard let dateBeg = Game.dateFromString(startDate),
+            let dateEnd = Game.dateFromString(endDate),
+            dateBeg.isAfter(dateEnd)
+                else{
+                    let error = ["error":"Dates not correct, End date should be after Begin date"]
+                    return try drop.view.make("error", error)
+            }
             
             var sctour: Tournament = Tournament(tourName: tourname, dateBeg: dateBeg, dateEnd: dateEnd)
             try sctour.save()
