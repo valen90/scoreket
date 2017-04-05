@@ -34,8 +34,8 @@ final class Tournament: Model {
         id = try node.extract("id")
         
         tourName = try node.extract("tourName")
-        dateBeg = try node.extract("dateBeg", transform: Game.dateFromString)
-        dateEnd = try node.extract("dateEnd", transform: Game.dateFromString)
+        dateBeg = try node.extract("dateBeg", transform: GameHelper.dateFromString)
+        dateEnd = try node.extract("dateEnd", transform: GameHelper.dateFromString)
         open = try node.extract("open")
         ended = try node.extract("ended")
         winner = try node.extract("winner")
@@ -45,8 +45,8 @@ final class Tournament: Model {
         return try Node(node: [
                 "id": id,
                 "tourName": tourName,
-                "dateBeg": Game.dateToString(dateBeg),
-                "dateEnd": Game.dateToString(dateEnd),
+                "dateBeg": GameHelper.dateToString(dateBeg),
+                "dateEnd": GameHelper.dateToString(dateEnd),
                 "open": open,
                 "ended": ended,
                 "winner": winner
@@ -61,8 +61,8 @@ final class Tournament: Model {
         return try JSON(node: [
             "id": id,
             "tourName": tourName,
-            "dateBeg": Game.dateToString(dateBeg),
-            "dateEnd": Game.dateToString(dateEnd),
+            "dateBeg": GameHelper.dateToString(dateBeg),
+            "dateEnd": GameHelper.dateToString(dateEnd),
             "open": open,
             "ended": ended,
             "winner": try winnerTeam?.makeJSON()

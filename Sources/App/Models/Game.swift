@@ -39,7 +39,7 @@ final class Game: Model {
         id = try node.extract("id")
         team1 = try node.extract("team1")
         team2 = try node.extract("team2")
-        date = try node.extract("date", transform: Game.dateFromString)!
+        date = try node.extract("date", transform: GameHelper.dateFromString)!
         ended = try node.extract("ended")
         result1 = try node.extract("result1")
         result2 = try node.extract("result2")
@@ -52,7 +52,7 @@ final class Game: Model {
                 "id": id,
                 "team1": team1,
                 "team2": team2,
-                "date": Game.dateToString(date),
+                "date": GameHelper.dateToString(date),
                 "ended": ended,
                 "result1": result1,
                 "result2": result2,
@@ -109,7 +109,7 @@ final class Game: Model {
             "id": id,
             "team1": try Team.find(team1)?.makeJSON(),
             "team2": try Team.find(team2)?.makeJSON(),
-            "date": Game.dateToString(date),
+            "date": GameHelper.dateToString(date),
             "ended": ended,
             "result1": result1,
             "result2": result2,
@@ -151,23 +151,3 @@ extension Game {
     }
 }
 
-extension Game {
-    static func dateFromString(_ dateAsString: String?) -> Date? {
-        guard let string = dateAsString else { return nil }
-        
-        let dateformatter = DateFormatter()
-        dateformatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        let val = dateformatter.date(from: string)
-        
-        return val
-    }
-    
-    static func dateToString(_ dateIn: Date?) -> String? {
-        guard let date = dateIn else { return nil }
-        let dateformatter = DateFormatter()
-        dateformatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        let val = dateformatter.string(from: date)
-        return val
-        
-    }
-}

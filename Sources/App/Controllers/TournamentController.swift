@@ -58,8 +58,8 @@ final class TournamentController{
             
             let endDate = validatedeYear.value+"-"+validatedeMonth.value+"-"+validatedeDay.value+" 23:59:00"
             
-            guard let dateBeg = Game.dateFromString(startDate),
-            let dateEnd = Game.dateFromString(endDate),
+            guard let dateBeg = GameHelper.dateFromString(startDate),
+            let dateEnd = GameHelper.dateFromString(endDate),
             dateEnd.isAfter(dateBeg)
             else{
                 let error = ["error":"Dates not correct, End date should be after Begin date"]
