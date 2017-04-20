@@ -2,5 +2,5 @@
     "host": "$DATABASE_HOSTNAME",
     "user": "$DATABASE_USER",
     "password": "$DATABASE_PASSWORD",
-    "database": "$DATABASE_DB",
+    "database": "$DATABASE_DB"
 }
