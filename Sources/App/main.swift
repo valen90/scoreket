@@ -32,4 +32,12 @@ drop.collection(game)
 let message = MessageRoutes()
 drop.collection(message)
 
+drop.get("date") { req in
+    let a = try TournamentHelper.getGamingCalendar(
+        begDay: GameHelper.dateFromString("2017-05-01 00:00:00")!,
+        endDay: GameHelper.dateFromString("2017-07-29 00:00:00")!
+    )
+    return "es el día \(a)"
+}
+
 drop.run()

@@ -1,14 +1,7 @@
-//
-//  TournamentHelper.swift
-//  scoket
-//
-//  Created by Valen on 29/03/2017.
-//
-//
-
 import Vapor
 import Foundation
 import Fluent
+import Sugar
 
 final class TournamentHelper{
     static let weekDay = 6 // Friday
@@ -24,7 +17,7 @@ final class TournamentHelper{
         let teams: [Team] = try tour.teams()
         var copy: [Team] = teams
         var game: Game?
-        var gameCalendar = TournamentHelper.getGamingCalendar(
+        var gameCalendar = try TournamentHelper.getGamingCalendar(
             begDay: tour.dateBeg!,
             endDay: tour.dateEnd!)
         var i = 0
@@ -79,32 +72,62 @@ final class TournamentHelper{
      Gets the available dates for a game between the given dates
      */
     
-    static func getGamingCalendar(begDay: Date, endDay: Date) -> [Date]{
+    static func getGamingCalendar(begDay: Date, endDay: Date) throws -> [Date]{
         
         var gameCalendar: [Date] = []
         var iteratorDay = begDay
         let endDay = endDay
-        var comp = DateComponents()
-        comp.weekday = TournamentHelper.weekDay
-        comp.hour = TournamentHelper.hour
-        comp.minute = TournamentHelper.minute
-        
-        while(iteratorDay <= endDay){
-            iteratorDay = Calendar.current.nextDate(
-                after: iteratorDay,
-                matching: comp,
-                matchingPolicy: .nextTime)!
-            
-            gameCalendar.append(iteratorDay)
-            
-            if comp.hour! < topHour {
-                comp.hour! += 1
-            } else {
-                comp.hour = TournamentHelper.hour
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "UTC")!
+        iteratorDay = iteratorDay.addingTimeInterval(TimeInterval(self.hour * 3600 + self.minute * 60))
+
+        while(endDay.isAfter(iteratorDay)){
+            var components = calendar.dateComponents([.hour, .weekday], from: iteratorDay)
+            guard let hour = components.hour else {
+                throw Abort.serverError
             }
+
+            if hour < self.topHour {
+                if components.weekday != self.weekDay {
+                    iteratorDay = try next(.friday, from: iteratorDay)
+                }
+                iteratorDay = iteratorDay.addingTimeInterval(TimeInterval(3600))
+            }
+            else {
+                iteratorDay = iteratorDay.addingTimeInterval(TimeInterval(16200 + (self.hour * 3600 + self.minute * 60))) // 16200 is the diference between the actual hour and the end of the day in seconds
+                iteratorDay = try next(.friday, from: iteratorDay)
+            }
+
+            gameCalendar.append(iteratorDay)
             
         }
         return gameCalendar
+    }
+
+    enum Weekday: Int {
+        case sunday = 1
+        case monday
+        case tuesday
+        case wednesday
+        case thursday
+        case friday
+        case saturday
+    }
+
+    static func next(_ weekday: Weekday, from date: Date) throws -> Date {
+        var date = date
+        let components = Calendar(identifier: .gregorian).dateComponents([.weekday], from: date)
+        guard let day = components.weekday else {
+            throw Abort.serverError
+        }
+
+        var delta = weekday.rawValue - day
+        if delta <= 0 {
+            delta += 7
+        }
+        date = date.addDays(delta)
+
+        return date
     }
     
 }

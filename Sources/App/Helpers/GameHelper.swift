@@ -86,6 +86,7 @@ final class GameHelper{
         guard let string = dateAsString else { return nil }
         
         let dateformatter = DateFormatter()
+        dateformatter.timeZone = TimeZone.init(identifier: "UTC")
         dateformatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         let val = dateformatter.date(from: string)
         
@@ -95,6 +96,7 @@ final class GameHelper{
     static func dateToString(_ dateIn: Date?) -> String? {
         guard let date = dateIn else { return nil }
         let dateformatter = DateFormatter()
+        dateformatter.timeZone = TimeZone.init(identifier: "UTC")
         dateformatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         let val = dateformatter.string(from: date)
         return val
